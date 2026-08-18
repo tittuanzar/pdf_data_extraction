@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "poc-valves"
+version = "0.1.0"
+description = "FastAPI service that extracts text from uploaded PDFs"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "OpenAI" }
+]
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "python-multipart>=0.0.9",
+  "pdfplumber",
+  "openpyxl>=3.1.5",
+  "openai>=3.2.0",
+]
+
+[project.optional-dependencies]
+pdf = ["pymupdf", "pdfplumber"]
+excel = ["openpyxl"]
+openai = ["openai>=1.0.0"]
+dev = ["pytest"]
+
+[project.scripts]
+poc-valves = "poc_valves.cli:main"
+field-mapping-register = "poc_valves.field_mapping_register.runner:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[dependency-groups]
+dev = [
+    "pandas>=2.3.3",
+]

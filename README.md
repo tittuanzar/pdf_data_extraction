@@ -1,0 +1,86 @@
+# PDF Text Extraction API
+
+This repository now contains two small PDF utilities:
+
+- a FastAPI service that accepts a PDF and returns all page text extracted with `pdfplumber`
+- a second endpoint that groups the PDF into tagged product sections using `Process Notes` as an end boundary
+- a Field Mapping Register extractor that reconstructs rows from PDF text via OpenAI and writes Excel output
+
+## What is included
+
+- A FastAPI upload endpoint
+- `pdfplumber` text extraction
+- Full document text plus page-by-page text in the response
+
+## What still needs to be filled in
+
+- OCR for scanned/image-only PDFs, if needed
+- A separate endpoint if you want tables, images, or OCR later
+
+## Quick start
+
+```bash
+uv sync
+uv run uvicorn poc_valves.api:create_app --factory --reload
+```
+
+## Docker
+
+Build and run the API:
+
+```bash
+docker compose up --build
+```
+
+The service listens on `http://localhost:8000`.
+
+Example request:
+
+```bash
+curl -X POST "http://localhost:8000/extract" \
+  -F "pdf=@/path/to/document.pdf"
+```
+
+Tagged product endpoint:
+
+```bash
+curl -X POST "http://localhost:8000/extract-tagged-products" \
+  -F "pdf=@/path/to/document.pdf"
+```
+
+The response includes:
+
+- `filename`
+- `page_count`
+- `text` for the full document
+- `pages` with one entry per page
+
+The tagged-product response also includes:
+
+- `sections` with one section per detected tag
+- `start_page` and `end_page`
+- raw section `text` for downstream table extraction
+- `pages` listing all extracted page texts
+
+If you later want the tagged-product sections expanded into fixed 66-field tables,
+share the exact 66-field schema and I can wire that into this endpoint.
+
+## Field Mapping Register extractor
+
+Install the same extras, then run:
+
+```bash
+export OPENAI_API_KEY=your_key_here
+uv run field-mapping-register --pdf /path/to/register.pdf --output field_mapping_register.xlsx
+```
+
+The runner prints a preview of the first 2-3 extracted rows before writing the
+Excel file.
+
+Useful environment variables:
+
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL` default: `gpt-4.1`
+- `OPENAI_MAX_OUTPUT_TOKENS`
+- `OPENAI_TEMPERATURE`
+- `OPENAI_TIMEOUT_SECONDS`

@@ -1,0 +1,542 @@
+,"Serial
+Number",Sv2 Field Name,"Enquiry Field Name
+(Customer Spec)","Enquiry Field Value
+(Customer Spec)",Units,"Mapping
+Category","Field
+Requirement",Logic,"Value for
+Sv2 Field","Service
+Dependency","Sector
+Dependency","Similar Field
+Terminologies","Similar Field
+Values","SV2 Spec
+Row Number","Sv2 Spec
+Field Name","Notes and
+Validations","Additional
+Information"
+0,1,Tag No,Tag No. (Row 1),"1803-FV-10401 | 1803-FV-1104 | 1803-FV-
+1403",—,Direct,Mandatory,"Copy tag number verbatim from top of Enquiry DS
+(Row 1, left column)","1803-FV-10401 | 1803-FV-1104 | 1803-
+FV-1403",No,No,"Tag Number; Instrument Tag; Tag
+ID; FV Tag",FV-XXXX; CV-XXXX; HCV-XXXX,Header,Tag No,"Tag number must match the P&ID reference in
+Row 1. Format: Plant-Instrument-Number.",
+1,2,Service,Service (Row 2),"SUSPECT CONDT PUMPS(P-606A/B)
+MCF | LP STEAM TO E-101 PREHEATER |
+RCSP HOPPER R-104 AERATION PLANT
+AIR",—,Direct,Mandatory,"Copy service description verbatim from Row 2 of
+Enquiry DS","SUSPECT CONDT PUMPS(P-606A/B)
+MCF | LP STEAM TO E-101
+PREHEATER | RCSP HOPPER R-104
+AERATION PLANT AIR",No,No,"Service Description; Valve Duty;
+Application",—,Row 1,Service,"May include equipment tag number in
+parentheses. Carry forward exactly as written.",
+2,3,Fluid Name,Process Fluid (Row 14),"SUSPECT LP CONDENSATE | LP Steam |
+PLANT AIR",—,Direct,Mandatory,Copy fluid name from Row 14 of Enquiry DS,"SUSPECT LP CONDENSATE | Steam |
+Air",Yes,No,"Process Fluid; Fluid; Medium;
+Service Fluid","Water; Condensate; Steam; LP
+Steam; Plant Air; Nitrogen;
+Propylene",Row 2,Fluid Name,"Fluid name determines the sizing equation set
+(liquid, steam, or gas). Cross-check with Row 15
+(Upstream Condition) for consistency.",
+3,4,Fluid Phase,Upstream Condition (Row 15),Water | Steam | Gas/Vapor,—,Derived,Mandatory,"Map Row 15 value to Sv2 dropdown:
+Water/Liquid/Condensate → Liquid; Steam/LP
+Steam/HP Steam → Steam; Gas/Vapor/Air/Nitrogen
+→ Gas",Liquid | Steam | Gas,Yes,No,State; Phase; Fluid State; Condition,"Liquid; Vapour; Gas; Steam; Two-
+Phase",Row 3,Fluid Phase,"This selection determines the entire sizing
+equation path in Solutioneer. An incorrect phase
+will give a completely wrong Cv result.",
+4,5,Inlet Pipe Size/Sch,"Line Size and Schedule — Inlet (Row
+11)",3 in STD | 12 in XS | 6 in STD,"in /
+Schedule",Direct,Mandatory,"Extract inlet size and schedule from Row 11 Inlet
+column. Parse leading number as nominal size;
+schedule follows (STD, XS, 40S etc.)",3 in/STD | 12 in/XS | 6 in/STD,No,No,"Inlet Line Size; Upstream Line
+Size; Inlet Pipe Class; NPS","1 in; 2 in; 3 in; 4 in; 6 in; 8 in; 12 in;
+STD; XS; SCH 40; SCH 80",Row 4,Inlet Pipe Size/Sch,"Line size also embedded in Row 3 Line Number
+tag (e.g. '3""-CL-1803...' → 3 in). Use Row 11 as
+primary source.",
+5,6,Outlet Pipe Size/Sch,"Line Size and Schedule — Outlet
+(Row 11)",3 in STD | 12 in XS | 6 in STD,"in /
+Schedule",Direct,Mandatory,"Extract outlet size and schedule from Row 11 Outlet
+column. Usually same as inlet unless expander is
+fitted.",3 in/STD | 12 in/XS | 6 in/STD,No,No,"Outlet Line Size; Downstream Pipe
+Size",Same as inlet in most cases,Row 5,Outlet Pipe Size/Sch,"If Outlet size differs from Inlet size, an
+expander/reducer is required. Flag for engineer
+review.",
+6,7,Design Pressure (MAX),"Design Pressure / Temperature (Row
+27)",12 kgf/cm²-g | 8 kgf/cm²-g | 10 kgf/cm²-g,kgf/cm²-g,Direct,Mandatory,"Extract maximum design pressure from Row 27 of
+Enquiry DS. This is the higher of the two values
+stated.",12 kgf/cm²-g | 8 kgf/cm²-g | 10 kgf/cm²-g,No,No,"Design Pressure; Max Design
+Pressure; DP MAX; MAWP",—,Row 6,Design Temp(MAX/MIN),"Design pressure determines the ASME pressure
+class (150#, 300#, 600# etc.) per ASME B16.34 P-
+T tables.",
+7,8,Design Pressure (MIN),"Design Pressure / Temperature (Row
+27)",FV kgf/cm²-g | FV kgf/cm²-g | — (not stated),kgf/cm²-g,Direct,Mandatory,"Extract minimum design pressure from Row 27. FV
+= Full Vacuum = -1.033 kgf/cm²-a (or 0 absolute).
+Carry as 'FV' text if shown.",FV | FV | —,No,No,"Min Design Pressure; Full Vacuum;
+FV; MDMP",FV; Full Vacuum; -1 barg; Vacuum,Row 7,Design Pressure(MAX/MIN),"FV = Full Vacuum as design condition. See DS
+Page 2 process notes. Confirm with engineer
+before populating Sv2.",
+8,9,Design Temp (MAX),"Design Pressure / Temperature (Row
+27)",150 °C | 220 °C | 65 °C,°C,Direct,Mandatory,"Extract maximum design temperature from Row 27
+of Enquiry DS.",150 °C | 220 °C | 65 °C,No,No,"Design Temperature; Max Temp;
+MADT; MDMT (max)",—,Row 7,Design Temp(MAX/MIN),"Determines material grade selection (e.g. need
+for low-temp grades below -29°C, or high-temp
+grades above 230°C).",
+9,10,Design Temp (MIN) / MDMT,"Ambient Temperature (Row 5) /
+Process Notes Page 2","4.4 °C (MDMT from process notes all 3
+tags)",°C,Derived,Mandatory,"MDMT (Minimum Design Metal Temperature) stated
+in DS Page 2 Process Notes. Not the same as
+ambient temperature (Row 5). Extract from notes
+text.",4.4 °C | 4.4 °C | 4.4 °C,No,No,"MDMT; Min Design Metal
+Temperature; Low Temp; Cold
+Design Temp",—,Row 7,Design Temp(MAX/MIN),"MDMT drives low-temperature material
+requirements (impact testing). Located in Page 2
+Process Notes, not Row 5.",
+10,11,Flow Rate (MAX),Flow Rate @ Max Flow (Row 18),10.5 | 6405 | 2640,"Am³/h |
+kg/h |
+Nm³/h",Direct,Mandatory,"Extract flow rate value from the '@ Max Flow'
+column of Row 18. Preserve units exactly as stated.",10.5 m³/h | 6405 kg/h | 2640 Nm³/h,Yes,No,"Maximum Flow Rate; Flow Max;
+Qmax; Mass Flow Max",m³/h; Am³/h; Nm³/h; kg/h; kg/s; lb/h,Row 11,Flow rate,"Units vary between liquid (Am³/h or kg/h) and gas
+(Nm³/h or kg/h). Check units column in Row 17
+header row.",
+11,12,Flow Rate (NOR),Flow Rate @ Norm Flow (Row 18),9.5 | 5823 | 2400,"Am³/h |
+kg/h |
+Nm³/h",Direct,Mandatory,"Extract flow rate value from the '@ Norm. Flow'
+column of Row 18.",9.5 m³/h | 5823 kg/h | 2400 Nm³/h,Yes,No,"Normal Flow Rate; Nominal Flow;
+Design Flow; Qnorm",Same as Max units,Row 11,Flow rate,"Normal (design) flow is the primary sizing case.
+Cv at Normal flow determines valve % travel
+target.",
+12,13,Flow Rate (MIN),Flow Rate @ Min Flow (Row 18),4.8 | 2912 | 2920,"Am³/h |
+kg/h |
+Nm³/h",Direct,Mandatory,"Extract flow rate value from the '@ Min. Flow'
+column of Row 18.",4.8 m³/h | 2912 kg/h | 2920 Nm³/h,Yes,No,"Minimum Flow Rate; Qmin; Low
+Flow",Same as Max units,Row 11,Flow rate,"Minimum flow case checks that valve does not
+throttle too close to closed position (< 10%
+travel).",
+13,14,Inlet Pressure (MAX),Inlet Pressure @ Max Flow (Row 19),6.8 | 3.31 | 4.3,kgf/cm²-g,Direct,Mandatory,"Extract inlet pressure from '@ Max Flow' column of
+Row 19.","6.8 kgf/cm²-g | 3.31 kgf/cm²-g | 4.3
+kgf/cm²-g",No,No,"P1 Max; Upstream Pressure Max;
+Inlet P Max","bar-g; kPa-g; psi-g; kgf/cm²-g;
+kgf/cm²-a",Row 12,Inlet Press.,"Check gauge vs absolute units. Enquiry DS uses
+kgf/cm²-g (gauge). If absolute ('a'), subtract 1.033
+to convert to gauge.",
+14,15,Inlet Pressure (NOR),Inlet Pressure @ Norm Flow (Row 19),6.8 | 3.31 | 4.33,kgf/cm²-g,Direct,Mandatory,"Extract inlet pressure from '@ Norm. Flow' column
+of Row 19.","6.8 kgf/cm²-g | 3.31 kgf/cm²-g | 4.33
+kgf/cm²-g",No,No,"P1 Norm; Upstream Pressure
+Normal; Inlet P Normal",Same as Max,Row 12,Inlet Press.,,
+15,16,Inlet Pressure (MIN),Inlet Pressure @ Min Flow (Row 19),6.9 | 3.32 | 4.4,kgf/cm²-g,Direct,Mandatory,"Extract inlet pressure from '@ Min. Flow' column of
+Row 19.","6.9 kgf/cm²-g | 3.32 kgf/cm²-g | 4.4
+kgf/cm²-g",No,No,P1 Min; Upstream Pressure Min,Same as Max,Row 12,Inlet Press.,,
+16,17,Outlet Pressure (MAX),"Not directly stated — derived from
+Rows 19 & 20","Calculated: 6.8 - 6.57 = 0.23 | 3.31 - 0.3 =
+3.01 | 4.3 - 1.72 = 2.58",kgf/cm²-g,Derived,Mandatory,"Outlet Pressure = Inlet Pressure (Row 19) −
+Pressure Drop (Row 20) for each case. Sv2 requires
+explicit outlet pressure.","0.23 kgf/cm²-g | 3.01 kgf/cm²-g | 2.58
+kgf/cm²-g",No,No,"P2 Max; Downstream Pressure
+Max; Back Pressure Max",—,Row 13,Outlet Press.,"If result is negative, check whether Enquiry DS
+uses absolute rather than gauge pressure. Flag
+for engineer confirmation.",
+17,18,Outlet Pressure (NOR),"Not directly stated — derived from
+Rows 19 & 20","Calculated: 6.8 - 6.6 = 0.20 | 3.31 - 0.31 =
+3.00 | 4.33 - 1.74 = 2.59",kgf/cm²-g,Derived,Mandatory,"Outlet Pressure NOR = Inlet Press NOR (Row 19
+NOR) − Pressure Drop NOR (Row 20 NOR)","0.20 kgf/cm²-g | 3.00 kgf/cm²-g | 2.59
+kgf/cm²-g",No,No,"P2 Norm; Downstream Pressure
+Normal",—,Row 13,Outlet Press.,,
+18,19,Outlet Pressure (MIN),"Not directly stated — derived from
+Rows 19 & 20","Calculated: 6.9 - 6.7 = 0.20 | 3.32 - 0.32 =
+3.00 | 4.4 - 1.83 = 2.57",kgf/cm²-g,Derived,Mandatory,"Outlet Pressure MIN = Inlet Press MIN (Row 19
+MIN) − Pressure Drop MIN (Row 20 MIN)","0.20 kgf/cm²-g | 3.00 kgf/cm²-g | 2.57
+kgf/cm²-g",No,No,P2 Min; Downstream Pressure Min,—,Row 13,Outlet Press.,,
+19,20,Pressure Drop (MAX),Pressure Drop @ Max Flow (Row 20),6.57 | 0.3 | 1.72,kgf/cm²,Direct,Mandatory,"Extract pressure drop from '@ Max Flow' column of
+Row 20.",6.57 kgf/cm² | 0.3 kgf/cm² | 1.72 kgf/cm²,No,No,"dP Max; Delta P Max; Differential
+Pressure Max; ΔP",bar; kPa; psi; kgf/cm²,Row 14,Pressure drop,"Pressure drop at max flow gives the largest Cv
+but may not be the most critical case for control.",
+20,21,Pressure Drop (NOR),Pressure Drop @ Norm Flow (Row 20),6.6 | 0.31 | 1.74,kgf/cm²,Direct,Mandatory,"Extract pressure drop from '@ Norm. Flow' column
+of Row 20.",6.6 kgf/cm² | 0.31 kgf/cm² | 1.74 kgf/cm²,No,No,dP Norm; Delta P Normal,Same as Max,Row 14,Pressure drop,,
+21,22,Pressure Drop (MIN),Pressure Drop @ Min Flow (Row 20),6.7 | 0.32 | 1.83,kgf/cm²,Direct,Mandatory,"Extract pressure drop from '@ Min. Flow' column of
+Row 20.",6.7 kgf/cm² | 0.32 kgf/cm² | 1.83 kgf/cm²,No,No,dP Min; Delta P Min,Same as Max,Row 14,Pressure drop,,
+22,23,Temperature (MAX),"Inlet Temperature @ Max Flow (Row
+21)",99.9 | 160 | 40,°C,Direct,Mandatory,"Extract temperature from '@ Max Flow' column of
+Row 21.",99.9 °C | 160 °C | 40 °C,Yes,No,"T Max; Process Temperature Max;
+Fluid Temp Max",°C; °F; K,Row 15,Temperature,"High temperature affects packing selection,
+bonnet type, and body material grade.",
+23,24,Temperature (NOR),"Inlet Temperature @ Norm Flow (Row
+21)",99.9 | 160 | 40,°C,Direct,Mandatory,"Extract temperature from '@ Norm. Flow' column of
+Row 21.",99.9 °C | 160 °C | 40 °C,Yes,No,"T Norm; Process Temperature
+Normal",Same as Max,Row 15,Temperature,,
+24,25,Temperature (MIN),"Inlet Temperature @ Min Flow (Row
+21)",99.99 | 160 | 40,°C,Direct,Mandatory,"Extract temperature from '@ Min. Flow' column of
+Row 21.",99.99 °C | 160 °C | 40 °C,Yes,No,T Min; Process Temperature Min,Same as Max,Row 15,Temperature,,
+25,26,"Specific Gravity / Molecular
+Weight","Inlet Density / Specific Gravity /
+Molecular Mass (Row 22)","955 kg/m³ (SG=0.955) | — (steam) | 28.96
+(MW)","kg/m³ or
+dimensionl
+ess or
+g/mol",Derived,Mandatory,"Liquid service: Row 22 gives density in kg/m³ →
+divide by 1000 to get SG (e.g. 955/1000 = 0.955).
+Gas service: Row 22 gives MW in g/mol (e.g. 28.96
+for air). Steam service: leave blank; Sv2 uses steam","SG = 0.955 | Blank (steam) | MW =
+28.96 g/mol",Yes,No,"Spec. Gravity; SG; Specific
+Gravity; Molecular Weight; MW;
+Density; Relative Density","kg/m³; kg/L; g/cm³; dimensionless
+SG; g/mol",Row 17,Spec. Gravity,"Units must be verified. If Row 22 header says
+'kg/m³' for a liquid, divide by 1000 for SG. If
+already dimensionless, use directly.",
+26,27,Viscosity,Inlet Viscosity (Row 24),0.276 | 0.014 | 0.0191,cP,Direct,Mandatory,"tables.
+Copy viscosity value from Row 24 of Enquiry DS.",0.276 cP | 0.014 cP | 0.0191 cP,Yes,No,"Viscosity; Dynamic Viscosity;
+Kinematic Viscosity; μ; Centipoise","cP; mPa·s; cSt (note: cSt ≠ cP for
+density ≠ 1)",Row 18,Viscosity,"Viscosity affects Fp correction factor for high-
+viscosity liquids. If in cSt, convert: cP = cSt × SG.",
+27,28,Compressibility Factor (Z),Inlet Compressibility Factor (Row 23),"— (liquid; not applicable) | — (steam) |
+0.999","Dimensionl
+ess",Direct,Conditional,"Extract Z from Row 23. Applicable for gas/vapour
+only. Leave blank for liquid and steam (Sv2 applies
+steam tables).",N/A (liquid) | N/A (steam) | 0.999,Yes,No,"Z Factor; Gas Compressibility;
+Compressibility; Z",0.95 to 1.05 typical range,Row 16,Z,"For ideal gases Z = 1.0. If Row 23 is blank for a
+gas service, use Z = 1.0 as default.",
+28,29,Specific Heats Ratio (K),Inlet Specific Heats Ratio (Row 25),"— (liquid; not applicable) | 1.317 (steam) |
+1.4 (air)","Dimensionl
+ess",Direct,Conditional,"Extract K from Row 25. Applicable for gas and
+steam only. Leave blank for liquid services.",N/A (liquid) | 1.317 | 1.4,Yes,No,"Isentropic Exponent; Cp/Cv;
+Gamma; K; Specific Heat Ratio","Air = 1.4; Steam ≈ 1.3; Nitrogen =
+1.4; CO2 = 1.3",Row 18,K,"K affects the choked flow (critical pressure drop
+ratio) calculation. If not stated for a gas service,
+use 1.4 as conservative default for diatomic
+gases.",
+29,30,Vapour Pressure,Inlet Vapour Pressure (Row 26),"1.031 kgf/cm²-a | — (steam; not applicable)
+| — (gas; not applicable)",kgf/cm²-a,Direct,Conditional,"Extract vapour pressure from Row 26. Applicable for
+liquid services only. Used to check cavitation and
+flashing.",1.031 kgf/cm²-a | N/A | N/A,Yes,No,"Pv; Vapour Pressure; Psat; Liquid
+Vapour Pressure",kgf/cm²-a; bar-a; psia; kPa-a,Row 16,Vapour Press.,"Must be in absolute pressure units. If given as
+gauge, add 1.033 kgf/cm² to convert to absolute.",
+30,31,Valve Type,Body Type (Row 32),"Single Seat Globe | Single Seat Globe |
+Single Seat Globe",—,Direct,Mandatory,"Copy body type from Row 32 of Enquiry DS
+verbatim.","Single Seat Globe | Single Seat Globe |
+Single Seat Globe",Yes,No,"Body Type; Valve Type; Valve
+Body Style; Body Style","Single Seated Globe; Double
+Seated Globe; Butterfly; Ball;
+Angle; Y-Pattern",Row 27,Type,"Valve type is always stated by the customer in
+this format. Do not leave for engineer to
+determine.",
+31,32,Body Material,Body Material (Row 36),"F.S. ASTM A105 Normalized | C.S. ASTM
+A216 WCB | C.S. ASTM A216 WCB",—,Direct,Mandatory,"Copy body material specification verbatim from Row
+36 of Enquiry DS. This is fully stated by the
+customer.","F.S. ASTM A105 Normalized | ASTM
+A216 Gr. WCC | ASTM A216 Gr. WCC",Yes,Yes,"Body Material; Body MOC; Body
+Grade; Pressure Boundary Material","A105; A216 WCB; A216 WCC;
+A351 CF8M; A351 CF3M; A182
+F316",Row 29,Body Material,"Note: Enquiry DS says 'A216 WCB' while KSB
+MIL DS shows 'A216 Gr. WCC' — verify with
+engineer. WCB and WCC are different grades.
+Do not silently change.",
+32,33,Bonnet Type,Bonnet Type / Material (Row 37),"Bolted Flange A105 | Bolted Flange A216
+WCB | Bolted Flange A216 WCB",—,Direct,Mandatory,"Copy bonnet type and material from Row 37 of
+Enquiry DS.","Bolted Flange A105 | Bolted Flange A216
+WCB | Bolted Flange A216 WCB",Yes,No,"Bonnet Type; Bonnet; Bonnet
+Style; Bonnet Material","Standard; Extended; Finned
+Extension; Cryogenic; Bolted
+Flange; Pressure Seal",Row 35,Bonnet Type,"Extended or finned bonnet required for steam
+above 200°C or cryogenic services. Check pipe
+insulation (Row 13) for guidance.",
+33,34,Flow Direction,Flow Direction (Row 38),"FTC (Flow-To-Close) | FTO (Flow-To-Open)
+| FTO (Flow-To-Open)",—,Direct,Mandatory,"Copy flow direction from Row 38 of Enquiry DS.
+FTC = Flow-To-Close; FTO = Flow-To-Open.","Flow to close | Flow to open | Flow to
+open",Yes,No,"Flow Direction; FTC; FTO; Flow-To-
+Close; Flow-To-Open; Flow Under
+Seat","FTC; FTO; Over the seat; Under
+the seat",Row 31,Flow Direction,"Flow direction affects actuator unbalance forces
+and determines stability. Customer-specified; do
+not change.",
+34,35,End Connection & Rating,End Connec. & Rating (Row 35),"1.5"" 300# RF | 8"" 300# RF | 4"" 300# RF",—,Direct,Mandatory,"Copy end connection type, size, and rating from
+Row 35 of Enquiry DS.","Flanged-ASME 300 RF | Flanged-ASME
+300 RF | Flanged-ASME 300 RF",No,No,"End Connection; Flange Rating;
+ANSI Class; Flange Type; Body
+Rating","ASME 150 RF; ASME 300 RF;
+ASME 600 RF; ASME 900 RTJ;
+Butt Weld","Rows
+30/32/33",End Conn. (Inlet/Outlet),"Body size shown in Row 33 ('By Vendor') means
+KSB MIL selects from catalogue after Cv
+calculation. Rating determines the body design
+pressure.",
+35,36,Flow Characteristic,"Characteristic (Rated Cv /
+Characteristic Row 34)",Linear | Equal% | Linear,—,Derived,Mandatory,"Row 34 shows 'By Vendor | Equal% | By Vendor'.
+For 'By Vendor', engineer selects based on process
+control requirements: Equal Percentage for pressure-
+drop ratio > 0.3; Linear for most other cases.",Linear | Equal % | Linear,Yes,No,"Characteristic; Flow Characteristic;
+Inherent Characteristic; Cv
+Characteristic","Linear; Equal Percentage; Quick
+Opening; Modified Parabolic",Row 40,Characteristic,"Equal Percentage selected when the valve
+pressure drop varies significantly across the flow
+range. Linear when pressure drop is relatively
+constant.",
+36,37,Trim / Plug Type,Trim Type (Row 42),"Low Noise Trim | Contoured Trim | Low
+Noise Trim",—,Direct,Mandatory,Copy trim type from Row 42 of Enquiry DS verbatim.,"Low Noise Trim (Anti-Cavitation) |
+Contoured Trim | Low Noise Trim",Yes,No,"Trim Type; Plug Type; Trim Style;
+Plug Style; Cage Type","Standard Contoured; Low Noise;
+Anti-Cavitation; Parabolic; V-Port;
+Characterized",Row 42,Plug Type,"Low Noise trim is specified because SPL at max
+flow approaches or exceeds allowable. Verify SPL
+result after Cv calculation.",
+37,38,Plug Material,Plug / Ball / Disk Material (Row 44),410 (13Cr) | 410 (13Cr) | 410 (13Cr),—,Direct,Mandatory,"Copy plug material from Row 44 of Enquiry DS
+verbatim.","SS 410 + Stellite No.6 | SS 410 + Stellite
+No.6 | SS 410 + Stellite No.6",Yes,Yes,"Plug Material; Ball Material; Disk
+Material; Trim Material; Plug MOC","SS 316; SS 410; 17-4PH; Stellite
+overlay; Hastelloy C",Row 46,Plug Material,"Enquiry DS states '410 (13Cr)'; KSB MIL DS
+output shows 'SS 410 + Stellite No.6' — the
+Stellite hard-facing is a KSB MIL standard
+addition for corrosion and erosion resistance.",
+38,39,Seat Material,Seat Material (Row 45),"St Gr6 (CoCrAlloy) | St Gr6 (CoCrAlloy) | St
+Gr6 (CoCrAlloy)",—,Direct,Mandatory,"Copy seat material from Row 45 of Enquiry DS
+verbatim.","SS 410 + Stellite No.6 | SS 410 + Stellite
+No.6 | SS 410 + Stellite No.6",Yes,Yes,"Seat Material; Seat Ring Material;
+Seat MOC","SS 316; SS 410; Stellite; Monel;
+Inconel",Row 47,Seat Material,"'St Gr6' = Stellite Grade 6 (Cobalt-Chromium
+alloy). KSB MIL DS shows seat as SS 410 +
+Stellite overlay. Confirm mapping with engineer.",
+39,40,Seat Leakage Class,Tightness Requirements (Row 7),"ANSI IV (standard) | ANSI IV (standard) |
+ANSI V",—,Derived,Mandatory,"Map customer tightness requirement to FCI 70.2
+leakage class: ANSI IV → IV (FCI 70.2); ANSI V →
+V (FCI 70.2); ANSI VI → VI (FCI 70.2)","IV (FCI 70.2) | IV (FCI 70.2) | V (FCI
+70.2)",No,No,"Leakage Class; Seat Leakage;
+Tightness Class; Shut-off Class","Class I; Class II; Class III; Class IV;
+Class V; Class VI; Zero Leakage",Row 41,Seat Leakage Class,"Class V required for Tag 3 (ANSI V). Class V
+requires lapped metal seat. Increases cost and
+lead time. Flag for review.",
+40,41,Guiding,Guiding / No. of Ports (Row 41),By Vendor / 1 (all tags),—,Engineered,Optional,"'By Vendor' means KSB MIL selects guiding
+arrangement. Standard for single-seated globe:
+Heavy Top Guiding for Tag 1 and 3; Cage Guiding
+for Tag 2 (heavy-duty steam).","Heavy Top Guiding | Cage Guiding |
+Heavy Top Guiding",Yes,No,"Guiding; Guide Type; Plug Guiding;
+Top-and-Bottom Guiding","Top Guided; Cage Guided; Top-
+and-Bottom Guided; Port Guided",Row 45,Guiding,"Guiding selection affects valve stability at high
+pressure drops. KSB MIL selects based on valve
+series and dP ratio.",
+41,42,Actuator Type,Type (Actuator) (Row 50),"Spring Diaphragm | Spring Diaphragm |
+Spring Diaphragm",—,Direct,Mandatory,Copy actuator type from Row 50 of Enquiry DS.,"Pneumatic Spring Diaphragm |
+Pneumatic Spring Diaphragm |
+Pneumatic Spring Diaphragm",No,No,"Actuator Type; Actuator Style;
+Pneumatic Actuator; Diaphragm
+Actuator","Spring Diaphragm; Piston; Scotch-
+Yoke; Electric; Electro-Hydraulic",Row 51,Type,"All three tags use Spring Diaphragm type — the
+most common pneumatic actuator. Piston
+actuator used for high shut-off or large bore
+valves.",
+42,43,Actuator Action / Air Failure,"Power Failure Position (Row 9) + Air
+Failure Valve (Row 52)","Open (R9) / Open (R52) | Close (R9) /
+Close (R52) | Open (R9) / Open (R52)",—,Derived,Mandatory,"Row 9 = Power Failure Position (safe position on air
+loss). Map: Fail Open → Air to Close (ATC); Fail
+Close → Air to Open (ATO). Row 52 confirms. Cross-
+check both rows.","Air to Close (ATC) | Air to Open (ATO) |
+Air to Close (ATC)",Yes,No,"Fail Position; Fail Safe; Air Failure;
+FO; FC; Air to Close; Air to Open;
+ATC; ATO","FO (Fail Open); FC (Fail Close); FL
+(Fail Last); Air to Close; Air to Open",Rows 53/54,Action / Air Failure,"Actuator colour coding follows: ATC (Fail Open)
+→ GREEN actuator; ATO (Fail Close) → RED
+actuator. See KSB MIL DS Sheet 2 Row 112.",
+43,44,Supply Pressure,Available Air Supply Pressure (Row 8),Min 3.5 kgf/cm² / Max 7 kgf/cm² (all tags),kgf/cm²,Derived,Mandatory,"Use minimum available supply pressure from Row 8.
+Convert to psi: × 14.223. Round to nearest standard
+value. 3.5 kgf/cm² × 14.223 ≈ 50 psi.",50 psi (all tags),No,No,"Air Supply; Instrument Air; IA
+Supply; Air Supply Pressure;
+Pneumatic Supply",35 psi; 50 psi; 60 psi; 80 psi,Row 56,Supply Press.,"Use minimum supply to ensure actuator can
+stroke even at lowest supply condition. Bench
+range must be set below supply pressure minus
+positioner overhead (~5 psi).",
+44,45,Bench Range,Bench Range (Row 54),By Vendor | By Vendor | By Vendor,psi,Engineered,Mandatory,"'By Vendor' on all three tags → KSB MIL calculates
+bench range from actuator sizing (spring rate ×
+travel + preload). Typical values: 3-15 psi, 6-30 psi.
+KSB MIL DS shows 3-15 psi (Tag1) and 6-30 psi","3-15 psi (Tag1) | 6-30 psi (Tag2) | 5-18
+psi (Tag3)",No,No,"Bench Range; Spring Range;
+Spring Calibration; Air Range;
+Bench Set",3-15 psi; 6-30 psi; 3-27 psi; 6-18 psi,Row 55,Bench Range,"Bench range calculated by actuator sizing to
+ensure adequate shut-off thrust. Cannot be
+determined from Enquiry DS alone — leave for
+engineer.",
+45,46,Shut-off Pressure,Actuator Design Pressure (Row 10),"Not stated in Enquiry DS — derived from
+Row 27 Design Pressure",kgf/cm²,Derived,Mandatory,"(Tag2).
+Shut-off pressure = maximum design pressure of
+valve (Row 27 MAX). KSB MIL DS Row 57 shows
+this value.","12 kgf/cm² (Tag1) | 8 kgf/cm² (Tag2) | 10
+kgf/cm² (Tag3)",No,No,"Shut-off Pressure; Actuator Rating;
+MAOP; Max Operating Pressure;
+Differential Shut-off Pressure",—,Row 57,Shut off Press.,"Used to size actuator spring and diaphragm area
+to ensure valve closes tightly against max design
+pressure.",
+46,47,Handwheel,Handwheel (Row 53),"— (dash; not specified) | — (dash) | Side
+Mounted",—,Direct,Optional,"Copy handwheel requirement from Row 53. '—' or
+blank = No handwheel. 'Side Mounted' = side-
+mounted handwheel assembly.",No/NA | No/NA | Yes/6A2 (Side Mounted),No,No,"Handwheel; Manual Override;
+Manual Operator; Side Handwheel;
+Top Handwheel","No; NA; Side Mounted; Top
+Mounted; Integral",Row 58,Hand Wheel/Model,"Tag 3 (Plant Air) requires side-mounted
+handwheel. This is a manual override device —
+allows operator to position valve when air supply
+is unavailable.",
+47,48,Positioner Type,"Not stated in Enquiry DS (Row 56 =
+VTA/VTA)",VTA / VTA (all tags),—,Engineered,Mandatory,"VTA = Vendor To Advise. KSB MIL selects standard
+smart positioner: Smart Single Acting (HART).
+Selection standard for all modulating control valves.",Smart Single Acting,No,No,"Positioner Type; Positioner Style;
+Electro-Pneumatic Positioner","Single Acting; Double Acting;
+Smart; Conventional; Digital",Row 72,Type,"Smart positioner integrates position transmitter —
+eliminates need for separate position transmitter
+hardware.",
+48,49,Positioner Make,Positioner MFR (Row 56),VTA (all tags),—,Derived,Mandatory,"VTA → KSB MIL standard selection: METSO. If
+customer specifies a make (not VTA), copy directly.",METSO,No,No,"Positioner Manufacturer; Positioner
+Make; Brand","METSO; SAMSON; FISHER; ABB;
+SIEMENS; ROTORK",Row 73,Make,"METSO ND9103 is the KSB MIL standard
+positioner. Alternative approved make: SAMSON
+3730.",
+49,50,Positioner Model,Positioner Model (Row 56),VTA (all tags),—,Derived,Mandatory,"VTA → KSB MIL standard model: ND9103-HX-T
+(HART communication, aluminium housing, ATEX
+certified).",ND9103-HX-T,No,No,Positioner Model; Model Number,"ND9103-HX-T; TZID-C; 3731-3;
+DVC6200",Row 74,Model,"ND9103-HX-T: HX = HART with XP rating; T =
+with position transmitter integrated.",
+50,51,Positioner Protocol / Casing,Signal Inlet (Row 57),4-20mA+HART / 3-15Psi (all tags),—,Derived,Mandatory,"Signal '4-20mA+HART' → Protocol = HART.
+Standard casing = Aluminium (IP66). Combined
+field: HART/Aluminium.",HART/Aluminium,No,No,"Communication Protocol;
+Positioner Protocol; Housing
+Material; Casing","HART; FOUNDATION Fieldbus;
+PROFIBUS PA; 4-20mA only",Row 75,Protocol / casing,,
+51,52,"Positioner Action / Input
+Signal","Signal Inlet (Row 57) + Increase
+Signal Valve (Row 58)","4-20mA+HART, Increase Signal = Close
+(Tags 1&3) / Open (Tag 2)",mA,Derived,Mandatory,"Combine action sense and signal: 'Increase Signal
+→ Close' = Direct Acting. 'Increase Signal → Open'
+= Reverse Acting. All tags use 4-20 mA input.
+Result: 'Direct/4-20 mA' for ATC valves.",Direct/4-20 mA (all tags),Yes,No,"Action; Input Signal; Positioner
+Action; Direct Acting; Reverse
+Acting","Direct/4-20mA; Reverse/4-20mA;
+Direct/3-15psi; Split-range",Row 76,Action/Input Signal,"'Increase Signal → Close' means as signal
+increases, valve closes. This is Direct Acting
+positioner (increasing air closes valve = ATC).
+For ATO valves, Increase Signal → Open is",
+52,53,Positioner Certification,Area Classification (Row 4),Zone 1 Gr. IIC T3 (all tags),—,Derived,Mandatory,"Zone 1 IIC T3 → Intrinsic Safety certification
+required: 'Intrinsic Safe Ex ia IIC, T6, with Weather
+Proof IP 66 Enclosure'","Intrinsic Safe Ex ia IIC, T6, WP IP66",No,Yes,"ATEX Certification; Hazardous
+Area Certificate; Ex Certification; IS
+Certificate","Ex ia; Ex d; EEx e; Ex n; PESO
+Certificate",Row 77,Certification,"typical.
+Zone 1 requires Intrinsic Safety (Ex ia) or
+Flameproof (Ex d) certification. KSB MIL standard
+uses Ex ia for positioner. PESO certificate also
+required (see quality requirements).",
+53,54,Position Transmitter,Position Transmitter (Row 61),Yes. 4-20mA+Hart (all tags),—,Derived,Conditional,"'Yes' → Position transmitter is integral to the smart
+positioner (METSO ND9103). No separate device.
+Mounting: Integral to Smart Positioner. Output: 24
+VDC / 4-20 mA (voltage from Row 62).","Integral to Smart Positioner / 24 VDC / 4-
+20mA",No,No,"Position Transmitter; Stem Position
+Transmitter; Position Feedback;
+LVDT","Integral; Separate; Remote Mount;
+LVDT; Hall Effect",Rows 86–89,"Type / Make/Model /
+Supply/Output","If Row 61 = 'No', populate Rows 86–92 as 'Not
+Required'. If a separate transmitter is specified
+(non-integral), treat as Engineered selection.",
+54,55,Airset Make/Model/Qty,Air Set MFR / Model (Row 72),VTA / VTA / VTA (all tags),—,Derived,Mandatory,"VTA → KSB MIL standard: Shavo SB77-276-M6KN-
+N, 1 No. Gauges: Yes (Row 74) → include pressure
+gauge.",Shavo/SB77-276-M6KN-N/1 No,No,No,"Air Set; Filter Regulator; AFR;
+Airset; Filter Reg Unit","Shavo; Norgren; SMC; Parker;
+Watts",Row 67,Make/Model/Qty,"Airset conditions instrument air (filters and
+regulates) before it enters positioner and actuator.
+Filter: 5 micron standard.",
+55,56,Airset Set Pressure / Filter,"Airset Set Pressure (Row 73) / Filter
+(Row 74)",By Vendor / Gauge: Yes (all tags),—,Derived,Mandatory,"Set pressure = minimum available air supply (Row 8
+MIN) = 3.5 kgf/cm² ≈ 50 psi. Filter size: standard = 5
+micron. Gauge: Yes.","Set Pressure: By Vendor / Filter: 5
+Micron / Gauge: Yes",No,No,"Set Pressure; Filter Size; Micron
+Rating; Filter Element","5 micron; 25 micron; 40 micron; 0.3
+micron","Rows
+68/73/74","Filter Size / Set Press /
+Gauge",,
+56,57,Painting Scheme,"Not in standard Enquiry DS body —
+from PO/project",Not stated in Enquiry DS,—,Engineered,Mandatory,"KSB MIL standard: Body — SPECIAL | Actuator —
+SPECIAL. Painting procedure reference from project
+PO (e.g. CP 121_PK233545).",Body - SPECIAL | Actuator - SPECIAL,No,Yes,"Painting; Paint Scheme; Surface
+Treatment; Colour Code","RAL 7001; IT 228HS; Epoxy;
+Primer + Top coat",Row 111,Painting Scheme,"Painting scheme varies by project. Always refer to
+PO painting specification. Body colour: Grey (IT
+228HS). Actuator colour: GREEN (fail-open) or
+RED (fail-close).",
+57,58,Actuator Colour,Power Failure Position (Row 9),Open | Close | Open,—,Derived,Mandatory,"Fail Open (Row 9 = Open) → Actuator colour
+GREEN. Fail Close (Row 9 = Close) → Actuator
+colour RED. Body always GREY (IT 228HS).",GREEN | RED | GREEN,No,No,"Actuator Colour; Actuator Color;
+Body Colour; Colour Code",Green; Red; Yellow; Grey,Row 112,Body Colour / Actuator Colour,"Colour coding is a visual safety indicator of fail-
+safe position. Standard: Green = Fail Open; Red
+= Fail Close.",
+58,59,Cable Gland Type,Not in Enquiry DS,Not stated,—,Engineered,Mandatory,"KSB MIL standard: Double compression type.
+Certification derived from Area Classification (Row
+4).",Double compression type,No,No,"Cable Gland; Gland Type; Cable
+Entry Device","Single compression; Double
+compression; Stopping plug; EMC
+gland",Row 130,Type,,
+59,60,Cable Gland Certification,Area Classification (Row 4),Zone 1 Gr. IIC T3 (all tags),—,Derived,Mandatory,"Zone 1 IIC → Explosion Proof: Ex d IIA, IIB, IIC.
+Material: SS 304 + PVC Hood. Cable Type: Flexible.","Explosion Proof Ex d IIA, IIB, IIC",No,Yes,"Cable Gland Certification; Gland
+Cert; Hazardous Area Gland; ATEX
+Gland",Ex d; Ex e; Ex n,Row 131,Certification,"Cable gland certification must be independent of
+positioner certification. Even if positioner is Ex ia,
+cable gland must be rated Ex d for Zone 1.",
+60,61,IBR Applicability,"Process Fluid (Row 14/15) +
+Specification Notes (DS Page 2)","Not steam (Tag1/3); IBR Applicable (Tag2
+— process notes state 'IBR Applicable')",—,Derived,Mandatory,"If fluid = steam AND 'IBR' appears in DS Page 2
+Spec/Process Notes → IBR applies. Valve must be
+tested and certified by IBR per Appendix L.
+Otherwise 'IBR Not Required'.","IBR Not Required (Tag1/3) | IBR
+Certificate in Form IIIC (Tag2)",Yes,Yes,"IBR; Indian Boiler Regulation;
+Boiler Certificate; IBR Certificate","IBR Applicable; IBR Required;
+Form IIIC; Not applicable to IBR",Rows 137/145,"Special Testing/Quality
+Requirements","IBR certificate requires third-party inspection
+during manufacturing. Increases lead time by 4-6
+weeks. Flag immediately when identified.",
+61,62,NDT — RT Extent,"Not in Enquiry DS directly — standard
+requirement","Standard for all castings (Body, Bonnet,
+Flanges)",—,Derived,Mandatory,"Standard KSB MIL requirement for all projects: 10%
+RT per lot for
+Body/Bonnet/Com.Flange/Expander/LNP. Trigger:
+always apply unless customer explicitly waives.","[0510] RT extent 10% per lot —
+BODY/BONNET/COM.FLANGE/EXP/LN
+P",No,No,"RT; Radiographic Testing; X-Ray;
+NDE; NDT","10% RT; 100% RT; Spot RT; UT
+(Ultrasonic)",Row 138,"Special Testing/Quality
+Requirements",,
+62,63,NDT — PMI Test,"Not in Enquiry DS directly — standard
+requirement",Standard for all trim parts,—,Derived,Mandatory,"Standard KSB MIL requirement: PMI Test (Standard
+grade) for all trim parts. Trigger: always apply.","[1801] PMI Test (Std) applicable for
+TRIM PARTS",No,No,"PMI; Positive Material
+Identification; Material Test; XRF;
+Chemical Analysis","PMI Standard; PMI Full; 100% PMI;
+PMI on castings",Row 142,"Special Testing/Quality
+Requirements","PMI verifies that trim materials match
+specification (e.g. confirms SS 410 is not SS 304
+supplied in error).",
+63,64,NDT — IGC Test,"Trim/Seat Material (Rows 44/45) —
+triggered by Austenitic SS","Plug: 410 (13Cr) — not austenitic, trigger
+NOT activated for these tags",—,Derived,Conditional,"IGC test triggered when plug/seat material contains
+Austenitic Stainless Steel (SS316, CF8M, CF3M,
+304 etc.). SS 410 (martensitic) and Stellite do NOT
+trigger IGC. For these three tags: IGC row is","[1707] IGC testing as per Prac.E, 250×
+microstructure (applicable for Aust.SS
+Trim Parts)",Yes,No,"IGC; Intergranular Corrosion;
+Sensitisation Test; ASTM A262
+Prac E","IGC Test; Weld Decay Test;
+Sensitisation",Row 139,"Special Testing/Quality
+Requirements","If trim material is changed to SS316 or CF8M in a
+future revision, IGC test becomes mandatory.",
+64,65,Valve Operating Signature,"Not in Enquiry DS — standard
+requirement",Standard for all control valves,—,Derived,Mandatory,"populated as standard but may not be strictly
+Standard KSB MIL requirement: valve operating
+signature (stem position vs control signal) to be
+supplied on CD/soft copy.","[2805] Valves operating signature in the
+form of CD",No,No,"Operating Signature; Valve
+Signature; Stroke Test Record;
+Loop Test","CD; PDF; Digital Report; FAT
+Record",Row 143,"Special Testing/Quality
+Requirements",,
+65,66,PESO Certificate,Area Classification (Row 4),Zone 1 Gr. IIC T3 (all tags),—,Derived,Mandatory,"Hazardous area (Zone 1 or Zone 2) → PESO
+certificate required for all electrical accessories
+(positioner, solenoid valve if any, limit switches if
+any).","[2301] PESO Certificate for All Electrical
+Accessories",No,Yes,"PESO; CCOE; Hazardous Area
+Certificate; Electrical Accessory
+Certificate",PESO; CCOE; Statutory approval,Row 144,"Special Testing/Quality
+Requirements","PESO (Petroleum and Explosives Safety
+Organisation) is the Indian statutory body.
+Certificate must be obtained before despatch.
+Add 4-6 weeks to delivery if not pre-certified.",

@@ -1,0 +1,16 @@
+[
+  {
+    "field_id": "valve_number",
+    "field_name": "Valve Number",
+    "data_type": "string",
+    "required": false,
+    "aliases": ["valve no", "valve no.", "valve"]
+  },
+  {
+    "field_id": "document_number",
+    "field_name": "Document Number",
+    "data_type": "string",
+    "required": false,
+    "aliases": ["doc no", "doc number", "document no"]
+  }
+]

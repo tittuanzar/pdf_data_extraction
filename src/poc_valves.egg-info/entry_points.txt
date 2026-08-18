@@ -1,0 +1,3 @@
+[console_scripts]
+field-mapping-register = poc_valves.field_mapping_register.runner:main
+poc-valves = poc_valves.cli:main
