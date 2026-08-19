@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 
 try:
-    from fastapi import FastAPI, File, HTTPException, UploadFile
+    from fastapi import FastAPI, File, HTTPException, Query, UploadFile
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.responses import StreamingResponse
     from openpyxl import Workbook
@@ -16,7 +16,7 @@ except Exception as exc:  # pragma: no cover - optional dependency
     ) from exc
 
 from .pdf.pdf_text import extract_pdf_text, extract_pdf_tables_for_page
-from .pipeline.sv2_pipeline import extract_sv2_output_from_pages
+from .pipeline.sv2_pipeline import extract_sv2_output_from_pages, DEFAULT_MODEL, DEFAULT_TEMPERATURE
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+async def _log_config() -> None:
+    logger.info("Startup config — model: %s, temperature: %s", DEFAULT_MODEL, DEFAULT_TEMPERATURE)
 
 
 def _validate_pdf(pdf: UploadFile) -> None:
@@ -87,7 +92,11 @@ def _build_excel(parsed) -> io.BytesIO:
 
 
 @app.post("/extract-Tag-wise-Enquiry-pdf")
-async def sv2_extract(pdf: UploadFile = File(...)) -> StreamingResponse:
+async def sv2_extract(
+    pdf: UploadFile = File(...),
+    model: str | None = Query(None, description=f"OpenAI model name (default: {DEFAULT_MODEL})"),
+    temperature: float | None = Query(None, description=f"Sampling temperature 0.0–2.0 (default: {DEFAULT_TEMPERATURE})"),
+) -> StreamingResponse:
     """Accept a PDF file and return an Excel workbook with extracted tags."""
     _validate_pdf(pdf)
 
@@ -102,9 +111,12 @@ async def sv2_extract(pdf: UploadFile = File(...)) -> StreamingResponse:
         try:
             text_result = extract_pdf_text(pdf_path)
             pages_meta = text_result.to_dict()["pages"]
+            total_pages = len(pages_meta)
+            logger.info("Processing %d page(s) from %s", total_pages, pdf.filename)
             pages = []
             for p in pages_meta:
                 pn = p["page_number"]
+                logger.info("Extracting text & tables from page %d/%d", pn, total_pages)
                 try:
                     tables_obj = extract_pdf_tables_for_page(pdf_path, pn, print_rows=False)
                     tables = tables_obj.to_dict()["tables"]
@@ -112,7 +124,25 @@ async def sv2_extract(pdf: UploadFile = File(...)) -> StreamingResponse:
                     tables = []
                 pages.append({"page_number": pn, "text": p["text"], "image_b64": "", "tables": tables})
 
-            parsed = extract_sv2_output_from_pages(pages, guide=None, debug=False)
+            total_text_chars = sum(len(p.get("text", "")) for p in pages)
+            total_tables = sum(len(p.get("tables", [])) for p in pages)
+            effective_model = model or DEFAULT_MODEL
+            effective_temp = temperature if temperature is not None else DEFAULT_TEMPERATURE
+            logger.info(
+                "Sending %d page(s) with %d table(s) (%d total text chars) to LLM "
+                "[model=%s, temperature=%s]",
+                total_pages, total_tables, total_text_chars, effective_model, effective_temp,
+            )
+
+            parsed = extract_sv2_output_from_pages(
+                pages,
+                guide=None,
+                debug=False,
+                model=model,
+                temperature=temperature,
+            )
+
+            logger.info("LLM returned %d tag(s) from %s", len(parsed.tags), pdf.filename)
         except Exception as exc:
             logger.exception("SV2 extraction failed")
             raise HTTPException(status_code=500, detail=str(exc)) from exc

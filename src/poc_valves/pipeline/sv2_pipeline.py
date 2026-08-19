@@ -17,6 +17,9 @@ logger = logging.getLogger(__name__)
 if not logger.handlers:
     logging.basicConfig(level=logging.INFO)
 
+DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+DEFAULT_TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "1.0"))
+
 # Optional cost configuration (per 1000 tokens). Set via env to compute cost; defaults to 0 (disabled).
 PROMPT_COST_PER_1K = float(os.getenv("OPENAI_PROMPT_COST_PER_1K", "0"))
 COMPLETION_COST_PER_1K = float(os.getenv("OPENAI_COMPLETION_COST_PER_1K", "0"))
@@ -75,6 +78,8 @@ def extract_direct_fields_with_context(
     guide: Optional[str] = None,
     tables: Optional[list[dict]] = None,
     debug: bool = False,
+    model: Optional[str] = None,
+    temperature: Optional[float] = None,
 ) -> PageExtraction | tuple[PageExtraction, object]:
     direct_fields = [f for f in registry if (not f.logic_type) or f.logic_type.lower() == "direct"]
     field_list = "\n".join(f"- {f.sv2_field_name}: look for '{f.source_hint}'" for f in direct_fields)
@@ -102,7 +107,8 @@ def extract_direct_fields_with_context(
 
     try:
         response = client.chat.completions.parse(
-            model="gpt-4o",
+            model=model or DEFAULT_MODEL,
+            temperature=temperature if temperature is not None else DEFAULT_TEMPERATURE,
             messages=[
                 {"role": "system", "content": (
                     "You extract field values verbatim from an engineering datasheet page. "
@@ -161,6 +167,8 @@ def extract_sv2_output_from_pages(
     pages: list[dict],
     guide: Optional[str] = None,
     debug: bool = False,
+    model: Optional[str] = None,
+    temperature: Optional[float] = None,
 ) -> ParsedOutput:
     """Ask the LLM to return the final SV2 datasheet payload using ParsedOutput."""
     client = _get_client()
@@ -174,7 +182,8 @@ def extract_sv2_output_from_pages(
     ]
 
     response = client.chat.completions.parse(
-        model="gpt-4o",
+        model=model or DEFAULT_MODEL,
+        temperature=temperature if temperature is not None else DEFAULT_TEMPERATURE,
         messages=[
             {
                 "role": "system",

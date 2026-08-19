@@ -95,7 +95,7 @@ class SV2ValveDatasheet(BaseModel):
             "Minimum design pressure in kgf/cm2(g). Direct mapping, "
             "Mandatory where applicable (e.g. Full Vacuum case). Used with "
             "MAX to bound the pressure class."
-            "Extract maximum design temperature from Row 27 of Enquiry DS."
+            "Extract maximum design temperature from Row 27 of table."
         ),
     )
 
