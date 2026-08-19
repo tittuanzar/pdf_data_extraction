@@ -1,0 +1,25 @@
+# =============================================================================
+# poc-valves — Application Settings
+# =============================================================================
+
+# Path to the reference guide Excel file used for field mapping.
+# This is resolved relative to the project root directory.
+reference_guide_path: "reference_guide.xlsx"
+
+# OpenAI / LLM defaults (also overridable via environment variables)
+llm:
+  model: "gpt-4.1-mini-2025-04-14"                       # overridden by OPENAI_MODEL env var
+  temperature: 0.01                       # overridden by OPENAI_TEMPERATURE env var
+  prompt_cost_per_1k: 0.0                # cost per 1000 prompt tokens ($)
+  completion_cost_per_1k: 0.0            # cost per 1000 completion tokens ($)
+
+# Postprocessing: apply engineered defaults and derived-field logic after
+# LLM extraction.  Set to false to skip (useful for debugging LLM-only output).
+postprocessing:
+  use_engineered_defaults: false     # apply KSB MIL defaults for Engineered fields
+
+# Which prompt keys to use (referencing names in prompts.yml)
+prompt_keys:
+  sv2_extraction_system: "sv2_extraction_system"
+  sv2_extraction_user: "sv2_extraction_user"
+  direct_extraction_system: "direct_extraction_system"

@@ -55,6 +55,8 @@ def _get_client():
 from pydantic import BaseModel, Field
 from ..schema.output_model import build_output_model, _sanitize_field_name
 from ..pydantic_output import ParsedOutput
+from ..config import settings
+from .postprocess import postprocess_tags
 
 
 class ExtractedField(BaseModel):
@@ -169,6 +171,7 @@ def extract_sv2_output_from_pages(
     debug: bool = False,
     model: Optional[str] = None,
     temperature: Optional[float] = None,
+    use_engineered_defaults: Optional[bool] = None,
 ) -> ParsedOutput:
     """Ask the LLM to return the final SV2 datasheet payload using ParsedOutput."""
     client = _get_client()
@@ -221,6 +224,14 @@ def extract_sv2_output_from_pages(
             parsed.model_extra = {"raw_llm": getattr(response.choices[0].message, "content", None)}
         except Exception:
             pass
+
+    # --- Postprocessing: fill engineered defaults & derived fields ---
+    if use_engineered_defaults is None:
+        use_engineered_defaults = settings.use_engineered_defaults
+    parsed.tags = postprocess_tags(
+        parsed.tags,
+        use_engineered_defaults=use_engineered_defaults,
+    )
 
     return parsed
 

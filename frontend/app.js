@@ -22,6 +22,7 @@
   const retryBtn  = $("#retry-btn");
   const doneMsg   = $("#done-msg");
   const dlBtn     = $("#download-btn");
+  const resetBtn  = $("#reset-btn");
 
   let file = null;
 
@@ -58,6 +59,7 @@
   fileInput.addEventListener("change", () => { if (fileInput.files[0]) pick(fileInput.files[0]); });
   clearBtn.addEventListener("click", (e) => { e.stopPropagation(); reset(); });
   retryBtn.addEventListener("click", reset);
+  resetBtn.addEventListener("click", reset);
 
   /* extract */
   extractBtn.addEventListener("click", async () => {

@@ -102,12 +102,14 @@ body {
 .state-card { padding: 20px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .state-card--error { background: var(--c-red50); border-color: #FECACA; }
 .state-card--done { background: var(--c-green50); border-color: #BBF7D0; }
-.state-row { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.state-row { display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1; overflow: hidden; }
+.state-row > div { min-width: 0; flex: 1; }
+.state-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .state-ico { width: 34px; height: 34px; flex-shrink: 0; }
-.state-title { font-size: 14px; font-weight: 600; }
+.state-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .state-title--error { color: var(--c-red600); }
 .state-title--done { color: #166534; }
-.state-sub { font-size: 13px; color: var(--c-text3); margin-top: 1px; }
+.state-sub { font-size: 13px; color: var(--c-text3); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .state-sub--error { color: var(--c-red700); }
 .state-sub--done { color: #166534; opacity: .75; }
 
@@ -129,5 +131,6 @@ body {
   .hero h1 { font-size: 22px; }
   .dz-empty { padding: 36px 16px; }
   .state-card { flex-direction: column; align-items: stretch; }
-  .state-card .btn { width: 100%; }
+  .state-card .state-actions { flex-direction: column; }
+  .state-card .state-actions .btn { width: 100%; }
 }

@@ -19,6 +19,7 @@ dependencies = [
   "pdfplumber",
   "openpyxl>=3.1.5",
   "openai>=3.2.0",
+  "pyyaml>=6.0",
 ]
 
 [project.optional-dependencies]

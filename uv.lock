@@ -1198,6 +1198,7 @@ dependencies = [
     { name = "openpyxl" },
     { name = "pdfplumber" },
     { name = "python-multipart" },
+    { name = "pyyaml" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -1234,6 +1235,7 @@ requires-dist = [
     { name = "pymupdf", marker = "extra == 'pdf'" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "python-multipart", specifier = ">=0.0.9" },
+    { name = "pyyaml", specifier = ">=6.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.30" },
 ]
 provides-extras = ["pdf", "excel", "openai", "dev"]
