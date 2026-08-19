@@ -5,17 +5,26 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from ..export import write_results_csv, write_results_json, write_results_xlsx
+from ..export import (
+    write_results_csv,
+    write_results_json,
+    write_results_xlsx,
+)
 from .llm import ExtractionClient, MockExtractionClient, parse_json_response
 from ..models import DocumentResult, ExtractedField, SchemaDefinition
 from ..pdf.preprocess import PreprocessResult, preprocess_pdf
 from .prompts import build_subcategory_prompt
-from ..schema.schema import all_subcategories, group_fields_by_subcategory
+from ..schema.schema import (
+    all_subcategories,
+    group_fields_by_subcategory,
+)
 from .validation import validate_result
 
 
 @dataclass(slots=True)
 class PipelineConfig:
+    """Configuration for the PDF extraction pipeline."""
+
     output_dir: Path
     render_dpi: int = 150
     max_workers: int = 4
@@ -25,15 +34,26 @@ class PipelineConfig:
 
 
 class PDFExtractionPipeline:
-    def __init__(self, schema: SchemaDefinition, client: ExtractionClient | None = None):
+    """Pipeline for extracting data from PDF documents."""
+
+    def __init__(
+        self,
+        schema: SchemaDefinition,
+        client: ExtractionClient | None = None,
+    ):
         self.schema = schema
         self.client = client or MockExtractionClient()
 
-    def run(self, pdf_path: str | Path, config: PipelineConfig) -> DocumentResult:
+    def run(
+        self, pdf_path: str | Path, config: PipelineConfig
+    ) -> DocumentResult:
+        """Run the extraction pipeline on a PDF file."""
         pdf_path = Path(pdf_path)
         config.output_dir.mkdir(parents=True, exist_ok=True)
 
-        preprocessed = preprocess_pdf(pdf_path, config.output_dir, dpi=config.render_dpi)
+        preprocessed = preprocess_pdf(
+            pdf_path, config.output_dir, dpi=config.render_dpi
+        )
         document_text = preprocessed.assembled_text()
 
         grouped_fields = group_fields_by_subcategory(self.schema)
@@ -45,14 +65,31 @@ class PDFExtractionPipeline:
         extracted_fields: dict[str, ExtractedField] = {}
 
         if not config.dry_run:
-            with ThreadPoolExecutor(max_workers=config.max_workers) as executor:
+            with ThreadPoolExecutor(
+                max_workers=config.max_workers
+            ) as executor:
                 futures = {}
                 for subcategory in subcategories:
                     fields = grouped_fields.get(subcategory, [])
                     if not fields:
                         continue
-                    prompt = build_subcategory_prompt(self.schema, subcategory, fields, document_text)
-                    futures[executor.submit(self.client.extract, prompt, images=self._image_paths_for_subcategory(fields, preprocessed))] = subcategory
+                    prompt = build_subcategory_prompt(
+                        self.schema,
+                        subcategory,
+                        fields,
+                        document_text,
+                    )
+                    image_paths = (
+                        self._image_paths_for_subcategory(
+                            fields, preprocessed
+                        )
+                    )
+                    future = executor.submit(
+                        self.client.extract,
+                        prompt,
+                        images=image_paths,
+                    )
+                    futures[future] = subcategory
 
                 for future in as_completed(futures):
                     subcategory = futures[future]
@@ -81,16 +118,36 @@ class PDFExtractionPipeline:
             raw_responses=raw_responses,
             page_artifacts=preprocessed.pages,
         )
-        validated = validate_result(self.schema, result, preprocessed.pages)
+        validated = validate_result(
+            self.schema, result, preprocessed.pages
+        )
 
-        write_results_json(config.output_dir / "results.json", validated)
-        write_results_csv(config.output_dir / "results.csv", self.schema, validated)
+        write_results_json(
+            config.output_dir / "results.json", validated
+        )
+        write_results_csv(
+            config.output_dir / "results.csv",
+            self.schema,
+            validated,
+        )
         if config.write_excel:
-            write_results_xlsx(config.output_dir / "results.xlsx", self.schema, validated)
+            write_results_xlsx(
+                config.output_dir / "results.xlsx",
+                self.schema,
+                validated,
+            )
         return validated
 
     def _image_paths_for_subcategory(
-        self, fields: list[Any], preprocessed: PreprocessResult
+        self,
+        fields: list[Any],
+        preprocessed: PreprocessResult,
     ) -> list[str]:
-        # The schema can later add per-field page targeting. For now we pass all pages.
-        return [page.image_path for page in preprocessed.pages if page.image_path]
+        """Get image paths for fields in a subcategory."""
+        # The schema can later add per-field page targeting.
+        # For now we pass all pages.
+        return [
+            page.image_path
+            for page in preprocessed.pages
+            if page.image_path
+        ]

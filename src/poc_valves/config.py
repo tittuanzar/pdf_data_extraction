@@ -1,9 +1,10 @@
 """
 Configuration loader for poc-valves.
 
-Reads ``config/settings.yml`` and ``config/prompts.yml`` once at import time
-and exposes typed accessors.  Values can be overridden via environment
-variables (env vars take precedence over YAML for LLM settings).
+Reads ``config/settings.yml`` and ``config/prompts.yml`` once at import
+time and exposes typed accessors.  Values can be overridden via
+environment variables (env vars take precedence over YAML for LLM
+settings).
 
 Usage::
 
@@ -37,6 +38,7 @@ _PROMPTS_PATH = _CONFIG_DIR / "prompts.yml"
 # Helpers
 # ---------------------------------------------------------------------------
 def _load_yaml(path: Path) -> dict[str, Any]:
+    """Load and return a YAML file as a dictionary."""
     if not path.exists():
         raise FileNotFoundError(f"Config file not found: {path}")
     with open(path, encoding="utf-8") as fh:
@@ -49,11 +51,15 @@ _ENV_OVERRIDES: dict[str, str] = {
     "OPENAI_TEMPERATURE": "llm.temperature",
     "OPENAI_PROMPT_COST_PER_1K": "llm.prompt_cost_per_1k",
     "OPENAI_COMPLETION_COST_PER_1K": "llm.completion_cost_per_1k",
-    "POSTPROCESSING_USE_ENGINEERED_DEFAULTS": "postprocessing.use_engineered_defaults",
+    "POSTPROCESSING_USE_ENGINEERED_DEFAULTS": (
+        "postprocessing.use_engineered_defaults"
+    ),
 }
 
 
-def _deep_set(d: dict, dotted_key: str, value: Any) -> None:
+def _deep_set(
+    d: dict, dotted_key: str, value: Any
+) -> None:
     """Set a nested value using a dotted key like 'llm.model'."""
     keys = dotted_key.split(".")
     for k in keys[:-1]:
@@ -62,13 +68,17 @@ def _deep_set(d: dict, dotted_key: str, value: Any) -> None:
 
 
 def _apply_env_overrides(data: dict) -> None:
+    """Apply environment variable overrides to the settings data."""
     for env_var, dotted_key in _ENV_OVERRIDES.items():
         raw = os.getenv(env_var)
         if raw is not None:
             # cast to the same type already in the dict (float vs str)
             existing = data
             for part in dotted_key.split("."):
-                existing = existing.get(part, None) if isinstance(existing, dict) else None
+                if isinstance(existing, dict):
+                    existing = existing.get(part, None)
+                else:
+                    existing = None
             if isinstance(existing, float):
                 try:
                     raw = float(raw)
@@ -100,10 +110,14 @@ class _Settings:
     # Top-level keys
     @property
     def reference_guide_path(self) -> str:
-        return str(self._data.get("reference_guide_path", "reference_guide.xlsx"))
+        """Return the reference guide path from settings."""
+        return str(
+            self._data.get("reference_guide_path", "reference_guide.xlsx")
+        )
 
     @property
     def reference_guide_abs_path(self) -> Path:
+        """Return the absolute path to the reference guide."""
         rp = Path(self.reference_guide_path)
         if rp.is_absolute():
             return rp
@@ -112,36 +126,46 @@ class _Settings:
     # LLM sub-dict
     @property
     def llm(self) -> dict[str, Any]:
+        """Return the LLM configuration sub-dictionary."""
         return self._data.get("llm", {})
 
     @property
     def model(self) -> str:
+        """Return the LLM model name."""
         return str(self.llm.get("model", "gpt-4o"))
 
     @property
     def temperature(self) -> float:
+        """Return the LLM temperature setting."""
         return float(self.llm.get("temperature", 1.0))
 
     @property
     def prompt_cost_per_1k(self) -> float:
+        """Return the prompt cost per 1k tokens."""
         return float(self.llm.get("prompt_cost_per_1k", 0.0))
 
     @property
     def completion_cost_per_1k(self) -> float:
+        """Return the completion cost per 1k tokens."""
         return float(self.llm.get("completion_cost_per_1k", 0.0))
 
     # Postprocessing sub-dict
     @property
     def postprocessing(self) -> dict[str, Any]:
+        """Return the postprocessing configuration sub-dictionary."""
         return self._data.get("postprocessing", {})
 
     @property
     def use_engineered_defaults(self) -> bool:
-        return bool(self.postprocessing.get("use_engineered_defaults", True))
+        """Return whether to use engineered defaults."""
+        return bool(
+            self.postprocessing.get("use_engineered_defaults", True)
+        )
 
     # Prompt keys sub-dict
     @property
     def prompt_keys(self) -> dict[str, str]:
+        """Return the prompt keys configuration sub-dictionary."""
         return self._data.get("prompt_keys", {})
 
     def __repr__(self) -> str:
@@ -165,15 +189,18 @@ _PLACEHOLDER_RE = re.compile(r"\{\{(\w+)\}\}")
 
 
 def get_prompt(name: str, **kwargs: str) -> str:
-    """Return the prompt text for *name*, with ``{{placeholder}}`` values
-    substituted from *kwargs*.
+    """Return the prompt text for *name*, with ``{{placeholder}}``
+    values substituted from *kwargs*.
 
-    Raises ``KeyError`` if the prompt name does not exist in the YAML file.
-    Raises ``ValueError`` if required placeholders are missing.
+    Raises ``KeyError`` if the prompt name does not exist in the YAML
+    file. Raises ``ValueError`` if required placeholders are missing.
     """
     if name not in _prompts_raw:
         available = ", ".join(sorted(_prompts_raw.keys()))
-        raise KeyError(f"Prompt '{name}' not found in prompts.yml. Available: {available}")
+        raise KeyError(
+            f"Prompt '{name}' not found in prompts.yml. "
+            f"Available: {available}"
+        )
 
     text: str = _prompts_raw[name]
 
@@ -181,7 +208,9 @@ def get_prompt(name: str, **kwargs: str) -> str:
     provided = set(kwargs.keys())
     missing = required - provided
     if missing:
-        raise ValueError(f"Missing placeholder(s) for prompt '{name}': {missing}")
+        raise ValueError(
+            f"Missing placeholder(s) for prompt '{name}': {missing}"
+        )
 
     def _replace(m: re.Match) -> str:
         key = m.group(1)

@@ -9,10 +9,12 @@ from ..models import FieldDefinition, SchemaDefinition
 
 
 class SchemaError(ValueError):
+    """Error raised when schema validation fails."""
     pass
 
 
 def load_schema(schema_path: str | Path) -> SchemaDefinition:
+    """Load a schema definition from a JSON file."""
     path = Path(schema_path)
     data = json.loads(path.read_text(encoding="utf-8"))
     schema = SchemaDefinition.from_dict(data)
@@ -25,48 +27,87 @@ def validate_schema_contract(
     *,
     require_complete: bool = False,
 ) -> None:
+    """Validate a schema definition against its contract."""
     if require_complete:
-        if schema.expected_field_count is not None and len(schema.fields) != schema.expected_field_count:
+        if (
+            schema.expected_field_count is not None
+            and len(schema.fields) != schema.expected_field_count
+        ):
             raise SchemaError(
-                f"Expected {schema.expected_field_count} fields, found {len(schema.fields)}"
+                f"Expected {schema.expected_field_count} fields, "
+                f"found {len(schema.fields)}"
             )
         if (
             schema.expected_subcategory_count is not None
-            and len(schema.subcategories) != schema.expected_subcategory_count
+            and len(schema.subcategories)
+            != schema.expected_subcategory_count
         ):
             raise SchemaError(
-                f"Expected {schema.expected_subcategory_count} subcategories, found {len(schema.subcategories)}"
+                f"Expected {schema.expected_subcategory_count} "
+                f"subcategories, "
+                f"found {len(schema.subcategories)}"
             )
 
     seen_ids: set[str] = set()
     for field in schema.fields:
         if field.field_id in seen_ids:
-            raise SchemaError(f"Duplicate field_id detected: {field.field_id}")
+            raise SchemaError(
+                f"Duplicate field_id detected: {field.field_id}"
+            )
         seen_ids.add(field.field_id)
         if not field.subcategory:
-            raise SchemaError(f"Field {field.field_id} is missing a subcategory")
-        if field.data_type not in {"string", "number", "date", "enum", "boolean", "object", "array"}:
-            raise SchemaError(f"Field {field.field_id} has invalid data_type: {field.data_type}")
+            raise SchemaError(
+                f"Field {field.field_id} is missing a subcategory"
+            )
+        valid_types = {
+            "string",
+            "number",
+            "date",
+            "enum",
+            "boolean",
+            "object",
+            "array",
+        }
+        if field.data_type not in valid_types:
+            raise SchemaError(
+                f"Field {field.field_id} has invalid "
+                f"data_type: {field.data_type}"
+            )
 
 
-def group_fields_by_subcategory(schema: SchemaDefinition) -> dict[str, list[FieldDefinition]]:
+def group_fields_by_subcategory(
+    schema: SchemaDefinition,
+) -> dict[str, list[FieldDefinition]]:
+    """Group fields by their subcategory."""
     grouped: dict[str, list[FieldDefinition]] = defaultdict(list)
     for field in schema.fields:
         grouped[field.subcategory].append(field)
     return dict(grouped)
 
 
-def build_field_index(schema: SchemaDefinition) -> dict[str, FieldDefinition]:
-    return {field.field_id: field for field in schema.fields}
+def build_field_index(
+    schema: SchemaDefinition,
+) -> dict[str, FieldDefinition]:
+    """Build an index of fields by their field_id."""
+    return {
+        field.field_id: field for field in schema.fields
+    }
 
 
-def all_subcategories(schema: SchemaDefinition) -> list[str]:
+def all_subcategories(
+    schema: SchemaDefinition,
+) -> list[str]:
+    """Return all subcategories in the schema."""
     if schema.subcategories:
         return list(schema.subcategories)
     grouped = group_fields_by_subcategory(schema)
     return sorted(grouped)
 
 
-def iter_required_fields(schema: SchemaDefinition) -> Iterable[FieldDefinition]:
-    return (field for field in schema.fields if field.required)
-
+def iter_required_fields(
+    schema: SchemaDefinition,
+) -> Iterable[FieldDefinition]:
+    """Iterate over required fields in the schema."""
+    return (
+        field for field in schema.fields if field.required
+    )

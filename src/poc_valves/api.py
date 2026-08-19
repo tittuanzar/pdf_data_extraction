@@ -16,7 +16,11 @@ except Exception as exc:  # pragma: no cover - optional dependency
     ) from exc
 
 from .pdf.pdf_text import extract_pdf_text, extract_pdf_tables_for_page
-from .pipeline.sv2_pipeline import extract_sv2_output_from_pages, DEFAULT_MODEL, DEFAULT_TEMPERATURE
+from .pipeline.sv2_pipeline import (
+    extract_sv2_output_from_pages,
+    DEFAULT_MODEL,
+    DEFAULT_TEMPERATURE,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +40,11 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def _log_config() -> None:
-    logger.info("Startup config — model: %s, temperature: %s", DEFAULT_MODEL, DEFAULT_TEMPERATURE)
+    logger.info(
+        "Startup config — model: %s, temperature: %s",
+        DEFAULT_MODEL,
+        DEFAULT_TEMPERATURE,
+    )
 
 
 def _validate_pdf(pdf: UploadFile) -> None:
@@ -49,7 +57,11 @@ def _validate_pdf(pdf: UploadFile) -> None:
             detail=f"Only PDF files are accepted. Got extension '{ext or '(none)'}'.",
         )
     content_type = (pdf.content_type or "").lower()
-    if content_type and content_type != ALLOWED_MIME and "pdf" not in content_type:
+    if (
+        content_type
+        and content_type != ALLOWED_MIME
+        and "pdf" not in content_type
+    ):
         raise HTTPException(
             status_code=400,
             detail=f"Only PDF files are accepted. Got content-type '{content_type}'.",
@@ -81,7 +93,9 @@ def _build_excel(parsed) -> io.BytesIO:
         ws.append(["Sl.No", "Feature name", "Extracted feature value"])
 
         field_values = tag.model_dump()
-        for sl, (field_name, value) in enumerate(field_values.items(), start=1):
+        for sl, (field_name, value) in enumerate(
+            field_values.items(), start=1
+        ):
             display_value = "" if value is None else value
             ws.append([sl, field_name, display_value])
 
@@ -104,30 +118,52 @@ async def sv2_extract(
         pdf_path = tmpdir_path / f"upload{suffix}"
         pdf_bytes = await pdf.read()
         pdf_path.write_bytes(pdf_bytes)
-        logger.info("SV2 extract: received file %s -> %s", pdf.filename, pdf_path)
+        logger.info(
+            "SV2 extract: received file %s -> %s", pdf.filename, pdf_path
+        )
 
         try:
             text_result = extract_pdf_text(pdf_path)
             pages_meta = text_result.to_dict()["pages"]
             total_pages = len(pages_meta)
-            logger.info("Processing %d page(s) from %s", total_pages, pdf.filename)
+            logger.info(
+                "Processing %d page(s) from %s", total_pages, pdf.filename
+            )
             pages = []
             for p in pages_meta:
                 pn = p["page_number"]
-                logger.info("Extracting text & tables from page %d/%d", pn, total_pages)
+                logger.info(
+                    "Extracting text & tables from page %d/%d",
+                    pn,
+                    total_pages,
+                )
                 try:
-                    tables_obj = extract_pdf_tables_for_page(pdf_path, pn, print_rows=False)
+                    tables_obj = extract_pdf_tables_for_page(
+                        pdf_path, pn, print_rows=False
+                    )
                     tables = tables_obj.to_dict()["tables"]
                 except Exception:
                     tables = []
-                pages.append({"page_number": pn, "text": p["text"], "image_b64": "", "tables": tables})
+                pages.append(
+                    {
+                        "page_number": pn,
+                        "text": p["text"],
+                        "image_b64": "",
+                        "tables": tables,
+                    }
+                )
 
             total_text_chars = sum(len(p.get("text", "")) for p in pages)
             total_tables = sum(len(p.get("tables", [])) for p in pages)
             logger.info(
-                "Sending %d page(s) with %d table(s) (%d total text chars) to LLM "
+                "Sending %d page(s) with %d table(s) "
+                "(%d total text chars) to LLM "
                 "[model=%s, temperature=%s]",
-                total_pages, total_tables, total_text_chars, DEFAULT_MODEL, DEFAULT_TEMPERATURE,
+                total_pages,
+                total_tables,
+                total_text_chars,
+                DEFAULT_MODEL,
+                DEFAULT_TEMPERATURE,
             )
 
             parsed = extract_sv2_output_from_pages(
@@ -136,19 +172,31 @@ async def sv2_extract(
                 debug=False,
             )
 
-            logger.info("LLM returned %d tag(s) from %s", len(parsed.tags), pdf.filename)
+            logger.info(
+                "LLM returned %d tag(s) from %s",
+                len(parsed.tags),
+                pdf.filename,
+            )
         except Exception as exc:
             logger.exception("SV2 extraction failed")
-            raise HTTPException(status_code=500, detail=str(exc)) from exc
+            raise HTTPException(
+                status_code=500, detail=str(exc)
+            ) from exc
 
     excel_buf = _build_excel(parsed)
-    output_filename = Path(pdf.filename or "output").stem + "_tags_extracted.xlsx"
+    output_filename = (
+        Path(pdf.filename or "output").stem + "_tags_extracted.xlsx"
+    )
 
     return StreamingResponse(
         excel_buf,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        media_type=(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ),
         headers={
-            "Content-Disposition": f'attachment; filename="{output_filename}"',
+            "Content-Disposition": (
+                f'attachment; filename="{output_filename}"'
+            ),
         },
     )
 

@@ -4,12 +4,18 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 
-DataType = Literal["string", "number", "date", "enum", "boolean", "object", "array"]
-IssueStatus = Literal["ok", "missing", "type_error", "unverified", "schema_error"]
+DataType = Literal[
+    "string", "number", "date", "enum", "boolean", "object", "array"
+]
+IssueStatus = Literal[
+    "ok", "missing", "type_error", "unverified", "schema_error"
+]
 
 
 @dataclass(slots=True)
 class FieldDefinition:
+    """Definition of a field in the schema."""
+
     field_id: str
     field_name: str
     subcategory: str
@@ -22,6 +28,7 @@ class FieldDefinition:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "FieldDefinition":
+        """Create a FieldDefinition from a dictionary."""
         return cls(
             field_id=str(data["field_id"]),
             field_name=str(data["field_name"]),
@@ -37,6 +44,8 @@ class FieldDefinition:
 
 @dataclass(slots=True)
 class SchemaDefinition:
+    """Definition of the overall schema for document extraction."""
+
     document_type: str
     version: str
     expected_field_count: int | None
@@ -47,13 +56,21 @@ class SchemaDefinition:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "SchemaDefinition":
-        fields = [FieldDefinition.from_dict(item) for item in data.get("fields", [])]
+        """Create a SchemaDefinition from a dictionary."""
+        fields = [
+            FieldDefinition.from_dict(item)
+            for item in data.get("fields", [])
+        ]
         subcategories = list(data.get("subcategories", []))
         return cls(
-            document_type=str(data.get("document_type", "unknown")),
+            document_type=str(
+                data.get("document_type", "unknown")
+            ),
             version=str(data.get("version", "0.0.0")),
             expected_field_count=data.get("expected_field_count"),
-            expected_subcategory_count=data.get("expected_subcategory_count"),
+            expected_subcategory_count=data.get(
+                "expected_subcategory_count"
+            ),
             fields=fields,
             subcategories=subcategories,
             raw=data,
@@ -62,6 +79,8 @@ class SchemaDefinition:
 
 @dataclass(slots=True)
 class PageArtifact:
+    """Represents extracted content from a single PDF page."""
+
     page_number: int
     text: str
     tables: list[list[list[str]]] = field(default_factory=list)
@@ -71,6 +90,8 @@ class PageArtifact:
 
 @dataclass(slots=True)
 class ExtractedField:
+    """Represents a single extracted field value."""
+
     field_id: str
     value: Any
     source_page: int | None = None
@@ -81,6 +102,8 @@ class ExtractedField:
 
 @dataclass(slots=True)
 class ValidationIssue:
+    """Represents a validation issue found during extraction."""
+
     field_id: str
     status: IssueStatus
     message: str
@@ -89,6 +112,8 @@ class ValidationIssue:
 
 @dataclass(slots=True)
 class DocumentResult:
+    """Result of document extraction and validation."""
+
     document_name: str
     metadata: dict[str, Any]
     fields: dict[str, ExtractedField]
@@ -97,6 +122,7 @@ class DocumentResult:
     page_artifacts: list[PageArtifact] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
+        """Convert the document result to a dictionary."""
         return {
             "document_name": self.document_name,
             "metadata": self.metadata,
