@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .models import FieldDefinition, SchemaDefinition
+from ..models import FieldDefinition, SchemaDefinition
 
 
 SYSTEM_PROMPT = (

@@ -5,7 +5,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Iterable
 
-from .models import FieldDefinition, SchemaDefinition
+from ..models import FieldDefinition, SchemaDefinition
 
 
 class SchemaError(ValueError):

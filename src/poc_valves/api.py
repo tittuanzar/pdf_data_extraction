@@ -12,11 +12,11 @@ except Exception as exc:  # pragma: no cover - optional dependency
         "FastAPI is not installed. Install the 'api' extra to run the web application."
     ) from exc
 
-from .pdf_text import PdfTextExtractionError, extract_pdf_text, extract_pdf_tables_for_page
+from .pdf.pdf_text import PdfTextExtractionError, extract_pdf_text, extract_pdf_tables_for_page
 import re
-from .tagged_products import extract_tagged_products
+from .pdf.tagged_products import extract_tagged_products
 import json
-from .sv2_pipeline import load_field_registry, run_pipeline_sv2, extract_sv2_output_from_pages
+from .pipeline.sv2_pipeline import load_field_registry, run_pipeline_sv2, extract_sv2_output_from_pages
 from .pydantic_output import ParsedOutput
 from pathlib import Path
 import logging

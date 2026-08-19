@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .pipeline import PDFExtractionPipeline, PipelineConfig
-from .schema import load_schema, validate_schema_contract
+from .pipeline.pipeline import PDFExtractionPipeline, PipelineConfig
+from .schema.schema import load_schema, validate_schema_contract
 from .field_mapping_register.runner import run_pipeline as run_field_mapping_register
 
 

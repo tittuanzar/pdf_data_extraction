@@ -5,9 +5,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
-from .models import DocumentResult, ExtractedField, FieldDefinition, SchemaDefinition
-from .preprocess import PreprocessResult, preprocess_pdf
-from .schema import validate_schema_contract
+from ..models import DocumentResult, ExtractedField, FieldDefinition, SchemaDefinition
+from ..pdf.preprocess import PreprocessResult, preprocess_pdf
+from ..schema.schema import validate_schema_contract
 from .validation import validate_result
 
 

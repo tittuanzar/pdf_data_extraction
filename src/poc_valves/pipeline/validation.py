@@ -5,7 +5,7 @@ from dataclasses import replace
 from datetime import datetime
 from typing import Any
 
-from .models import DocumentResult, ExtractedField, FieldDefinition, PageArtifact, SchemaDefinition, ValidationIssue
+from ..models import DocumentResult, ExtractedField, FieldDefinition, PageArtifact, SchemaDefinition, ValidationIssue
 
 
 def _coerce_value(field: FieldDefinition, value: Any) -> Any:

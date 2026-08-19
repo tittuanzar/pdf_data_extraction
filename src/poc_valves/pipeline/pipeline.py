@@ -5,12 +5,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from .export import write_results_csv, write_results_json, write_results_xlsx
+from ..export import write_results_csv, write_results_json, write_results_xlsx
 from .llm import ExtractionClient, MockExtractionClient, parse_json_response
-from .models import DocumentResult, ExtractedField, SchemaDefinition
-from .preprocess import PreprocessResult, preprocess_pdf
+from ..models import DocumentResult, ExtractedField, SchemaDefinition
+from ..pdf.preprocess import PreprocessResult, preprocess_pdf
 from .prompts import build_subcategory_prompt
-from .schema import all_subcategories, group_fields_by_subcategory
+from ..schema.schema import all_subcategories, group_fields_by_subcategory
 from .validation import validate_result
 
 

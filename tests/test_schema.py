@@ -11,8 +11,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from poc_valves.models import FieldDefinition, SchemaDefinition
 from poc_valves.pydantic_output import ParsedOutput
-from poc_valves.schema import build_field_index, group_fields_by_subcategory, validate_schema_contract
-from poc_valves.sv2_pipeline import extract_sv2_output_from_pages
+from poc_valves.schema.schema import build_field_index, group_fields_by_subcategory, validate_schema_contract
+from poc_valves.pipeline.sv2_pipeline import extract_sv2_output_from_pages
 
 
 class SchemaTests(unittest.TestCase):
@@ -48,12 +48,12 @@ class SchemaTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
-            from poc_valves.schema import load_schema
+            from poc_valves.schema.schema import load_schema
 
             schema = load_schema(path)
             self.assertEqual(schema.document_type, "demo")
 
-    @patch("poc_valves.sv2_pipeline._get_client")
+    @patch("poc_valves.pipeline.sv2_pipeline._get_client")
     def test_extract_sv2_output_uses_parsed_output_schema(self, mock_get_client):
         mock_client = MagicMock()
         mock_response = MagicMock()

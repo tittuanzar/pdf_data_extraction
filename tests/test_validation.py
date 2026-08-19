@@ -7,7 +7,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from poc_valves.models import DocumentResult, ExtractedField, FieldDefinition, PageArtifact, SchemaDefinition
-from poc_valves.validation import validate_result
+from poc_valves.pipeline.validation import validate_result
 
 
 class ValidationTests(unittest.TestCase):

@@ -8,8 +8,8 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from poc_valves.models import PageArtifact
-from poc_valves.preprocess import PreprocessResult
-from poc_valves.service import RequestedField, extract_requested_fields_from_preprocessed
+from poc_valves.pdf.preprocess import PreprocessResult
+from poc_valves.pipeline.service import RequestedField, extract_requested_fields_from_preprocessed
 
 
 class ServiceTests(unittest.TestCase):

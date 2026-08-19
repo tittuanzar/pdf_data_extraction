@@ -6,8 +6,8 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from poc_valves.pdf_text import PdfPageText
-from poc_valves.tagged_products import build_tagged_product_sections, extract_tag_ids
+from poc_valves.pdf.pdf_text import PdfPageText
+from poc_valves.pdf.tagged_products import build_tagged_product_sections, extract_tag_ids
 
 
 class TaggedProductsTests(unittest.TestCase):

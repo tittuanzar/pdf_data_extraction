@@ -50,8 +50,8 @@ def _get_client():
 
 
 from pydantic import BaseModel, Field
-from .output_model import build_output_model, _sanitize_field_name
-from .pydantic_output import ParsedOutput
+from ..schema.output_model import build_output_model, _sanitize_field_name
+from ..pydantic_output import ParsedOutput
 
 
 class ExtractedField(BaseModel):
@@ -225,7 +225,7 @@ def run_pipeline_sv2(registry: list[FieldSpecLite], pages: list[dict], guide: Op
     # build a dynamic Pydantic model (and mapping) from the reference guide registry
     try:
         # attempt to locate the reference guide path relative to package root
-        rg_path = str(Path(__file__).resolve().parents[2] / "reference_guide.xlsx")
+        rg_path = str(Path(__file__).resolve().parents[3] / "reference_guide.xlsx")
         OutputModel, field_mapping = build_output_model(rg_path)
     except Exception:
         OutputModel = None
