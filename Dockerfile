@@ -15,7 +15,7 @@ RUN apt-get update \
 
 COPY --from=ghcr.io/astral-sh/uv:0.12.2 /uv /bin/uv
 
-COPY pyproject.toml README.md schema.json ./
+COPY pyproject.toml README.md  ./
 COPY src ./src
 
 RUN uv sync

@@ -27,10 +27,6 @@ excel = ["openpyxl"]
 openai = ["openai>=1.0.0"]
 dev = ["pytest"]
 
-[project.scripts]
-poc-valves = "poc_valves.cli:main"
-field-mapping-register = "poc_valves.field_mapping_register.runner:main"
-
 [tool.setuptools]
 package-dir = {"" = "src"}
 
