@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ValveSpec Extractor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="#2563EB"/>
+            <path d="M9 10h4v12H9zM13 8h4v16h-4zM17 11h4v10h-4z" fill="#fff" opacity=".9"/>
+          </svg>
+          <span class="logo-text">ValveSpec</span>
+        </div>
+        <span class="badge">PDF Extractor</span>
+      </div>
+    </header>
+
+    <main class="main">
+
+      <div class="hero">
+        <h1>Extract Valve Datasheets</h1>
+        <p>Upload a Tag-wise Enquiry PDF. Get structured Excel output automatically.</p>
+      </div>
+
+      <div class="card">
+        <div class="dropzone" id="dropzone">
+          <div id="dropzone-empty" class="dz-empty">
+            <svg class="dz-icon" viewBox="0 0 56 56" fill="none">
+              <rect x="4" y="4" width="48" height="48" rx="12" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="6 4"/>
+              <path d="M28 38V20m0 0l-7 7m7-7l7 7" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="dz-label">Drag & drop your PDF here</span>
+            <span class="dz-sub">or click to browse</span>
+            <span class="dz-hint">PDF files only</span>
+            <input type="file" id="file-input" accept=".pdf" hidden>
+          </div>
+
+          <div id="dropzone-file" class="dz-file hidden">
+            <div class="dz-file-left">
+              <svg class="dz-file-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#2563EB" stroke-width="1.5"/>
+                <path d="M14 2v6h6" stroke="#2563EB" stroke-width="1.5"/>
+                <path d="M9 13h6M9 17h3" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <div>
+                <p class="dz-file-name" id="file-name"></p>
+                <p class="dz-file-meta" id="file-meta"></p>
+              </div>
+            </div>
+            <button class="icon-btn" id="clear-btn" title="Remove">
+              <svg viewBox="0 0 20 20" fill="none"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="extract-btn" disabled>
+        <svg class="btn-ico" viewBox="0 0 20 20" fill="none"><path d="M10 3v10m0 0l-4-4m4 4l4-4M4 17h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Extract to Excel
+      </button>
+
+      <div id="state-progress" class="state hidden">
+        <div class="card state-card">
+          <div class="state-row">
+            <div class="spinner"></div>
+            <div>
+              <p class="state-title" id="prog-title">Uploading PDF...</p>
+              <p class="state-sub" id="prog-sub">Sending file to extraction service</p>
+            </div>
+          </div>
+          <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+        </div>
+      </div>
+
+      <div id="state-error" class="state hidden">
+        <div class="card state-card state-card--error">
+          <div class="state-row">
+            <svg class="state-ico" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#EF4444" stroke-width="2"/><path d="M12 8v5m0 3h.01" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/></svg>
+            <div>
+              <p class="state-title state-title--error">Extraction Failed</p>
+              <p class="state-sub state-sub--error" id="err-msg"></p>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm" id="retry-btn">Try Again</button>
+        </div>
+      </div>
+
+      <div id="state-done" class="state hidden">
+        <div class="card state-card state-card--done">
+          <div class="state-row">
+            <svg class="state-ico" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/><path d="M13 20l4.5 4.5L27 15" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>
+              <p class="state-title state-title--done">Extraction Complete</p>
+              <p class="state-sub state-sub--done" id="done-msg"></p>
+            </div>
+          </div>
+          <a class="btn btn-success" id="download-btn" download>
+            <svg class="btn-ico" viewBox="0 0 20 20" fill="none"><path d="M10 3v10m0 0l-4-4m4 4l4-4M4 17h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Download Excel
+          </a>
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="footer">
+      <p>ValveSpec Extractor &mdash; AI-powered valve datasheet extraction</p>
+    </footer>
+
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

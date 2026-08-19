@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 
 try:
-    from fastapi import FastAPI, File, HTTPException, Query, UploadFile
+    from fastapi import FastAPI, File, HTTPException, UploadFile
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.responses import StreamingResponse
     from openpyxl import Workbook
@@ -94,8 +94,6 @@ def _build_excel(parsed) -> io.BytesIO:
 @app.post("/extract-Tag-wise-Enquiry-pdf")
 async def sv2_extract(
     pdf: UploadFile = File(...),
-    model: str | None = Query(None, description=f"OpenAI model name (default: {DEFAULT_MODEL})"),
-    temperature: float | None = Query(None, description=f"Sampling temperature 0.0–2.0 (default: {DEFAULT_TEMPERATURE})"),
 ) -> StreamingResponse:
     """Accept a PDF file and return an Excel workbook with extracted tags."""
     _validate_pdf(pdf)
@@ -126,20 +124,16 @@ async def sv2_extract(
 
             total_text_chars = sum(len(p.get("text", "")) for p in pages)
             total_tables = sum(len(p.get("tables", [])) for p in pages)
-            effective_model = model or DEFAULT_MODEL
-            effective_temp = temperature if temperature is not None else DEFAULT_TEMPERATURE
             logger.info(
                 "Sending %d page(s) with %d table(s) (%d total text chars) to LLM "
                 "[model=%s, temperature=%s]",
-                total_pages, total_tables, total_text_chars, effective_model, effective_temp,
+                total_pages, total_tables, total_text_chars, DEFAULT_MODEL, DEFAULT_TEMPERATURE,
             )
 
             parsed = extract_sv2_output_from_pages(
                 pages,
                 guide=None,
                 debug=False,
-                model=model,
-                temperature=temperature,
             )
 
             logger.info("LLM returned %d tag(s) from %s", len(parsed.tags), pdf.filename)
