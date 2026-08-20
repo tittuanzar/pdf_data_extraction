@@ -2,6 +2,7 @@ import os
 import uuid
 import tempfile
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from poc_valves.pdf_extraction.core.config import settings
 
@@ -14,7 +15,6 @@ from poc_valves.pdf_extraction.services.config_service import (
 from poc_valves.pdf_extraction.services.pdf_service import extract_pdf_pages
 from poc_valves.pdf_extraction.services.classification_service import classify_pages
 from poc_valves.pdf_extraction.services.embedding_service import (
-    create_embedding,
     create_embeddings,
     build_main_category_embedding_text,
     build_parameter_embedding_text,
@@ -138,11 +138,14 @@ class PdfExtractionPipeline:
                 create_embeddings(parameter_texts)
             ))
 
-            for page in pages:
+            page_embeddings = create_embeddings(
+                [page["content"] for page in pages]
+            )
+
+            for page, embedding in zip(pages, page_embeddings):
                 page_number = page["page_number"]
                 categories = classification_map.get(page_number, [])
                 category_names = [item["category"] for item in categories]
-                embedding = create_embedding(page["content"])
 
                 store_page(
                     request_id=request_id,
@@ -152,9 +155,7 @@ class PdfExtractionPipeline:
                     embedding=embedding,
                 )
 
-            all_results = []
-
-            for main_category, sub_categories in main_category_map.items():
+            def _extract_for_category(main_category, sub_categories):
                 category_pages = get_pages_for_category(
                     request_id,
                     main_category,
@@ -162,7 +163,7 @@ class PdfExtractionPipeline:
                 )
 
                 if not category_pages:
-                    continue
+                    return []
 
                 parameters = [
                     parameter
@@ -187,7 +188,21 @@ class PdfExtractionPipeline:
                     parameter_page_hints=parameter_page_hints,
                 )
 
-                all_results.extend(result.get("results", []))
+                return result.get("results", [])
+
+            all_results = []
+
+            # Each main category is an independent LLM call, so they're
+            # run concurrently (bounded by LLM_MAX_CONCURRENCY) instead of
+            # one after another - this is the dominant cost in the pipeline.
+            with ThreadPoolExecutor(max_workers=settings.LLM_MAX_CONCURRENCY) as executor:
+                futures = [
+                    executor.submit(_extract_for_category, main_category, sub_categories)
+                    for main_category, sub_categories in main_category_map.items()
+                ]
+
+                for future in as_completed(futures):
+                    all_results.extend(future.result())
 
             accuracy_map = evaluate_accuracy(
                 configuration_df=configuration_df,

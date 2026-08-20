@@ -1,5 +1,6 @@
 import json
 import logging
+from concurrent.futures import ThreadPoolExecutor
 
 from openai import OpenAI
 
@@ -135,9 +136,13 @@ def evaluate_accuracy(
         return {}
 
     accuracy_map = {}
+    batches = list(_chunk(comparisons, batch_size))
 
-    for batch in _chunk(comparisons, batch_size):
-        accuracy_map.update(_evaluate_batch(batch))
+    # Batches are scored independently, so they're run concurrently
+    # (bounded by LLM_MAX_CONCURRENCY) instead of one after another.
+    with ThreadPoolExecutor(max_workers=settings.LLM_MAX_CONCURRENCY) as executor:
+        for result in executor.map(_evaluate_batch, batches):
+            accuracy_map.update(result)
 
     logger.info(
         "evaluate_accuracy: final accuracy_map has %d entries", len(accuracy_map)

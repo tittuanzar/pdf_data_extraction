@@ -41,6 +41,12 @@ class Settings(BaseSettings):
     # Number of Ext. ID comparisons sent per accuracy-evaluation LLM call.
     ACCURACY_BATCH_SIZE: int = 25
 
+    # Max number of LLM requests issued at once when a phase (per-category
+    # extraction, accuracy-batch scoring) has several independent calls to
+    # make. Only affects PdfExtractionPipeline (the configurable/generic
+    # document endpoint) - the tag-wise SV2 pipeline is unaffected.
+    LLM_MAX_CONCURRENCY: int = 5
+
     model_config = SettingsConfigDict(
         env_file=str(_PROJECT_ROOT / ".env"),
         extra="ignore"
