@@ -6,8 +6,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from poc_valves.pipeline import postprocess
-from poc_valves.pydantic_output import PartialSV2ValveDatasheet
+from poc_valves.core.pipeline import postprocess
+from poc_valves.core.models import PartialSV2ValveDatasheet
 
 
 # Sample values below are taken from config/reference.yml's

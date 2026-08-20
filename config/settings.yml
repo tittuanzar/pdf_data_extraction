@@ -2,8 +2,9 @@
 # poc-valves — Application Settings
 # =============================================================================
 
-# Path to the reference guide file used for field mapping.
-# This is resolved relative to the project root directory.
+# Path to the reference guide (field registry) YAML file, resolved
+# relative to the project root if not absolute. Also overridable via the
+# REFERENCE_GUIDE_PATH env var.
 reference_guide_path: "config/reference.yml"
 
 # OpenAI / LLM defaults (also overridable via environment variables)

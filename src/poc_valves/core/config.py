@@ -8,7 +8,7 @@ settings).
 
 Usage::
 
-    from poc_valves.config import settings, get_prompt
+    from poc_valves.core.config import settings, get_prompt
 
     reference_path = settings.reference_guide_path
     system_msg = get_prompt("tags_extraction.system_prompt")
@@ -27,12 +27,13 @@ import yaml
 # ---------------------------------------------------------------------------
 # Resolve config directory (project_root / config)
 # ---------------------------------------------------------------------------
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+# File lives at src/poc_valves/core/config.py, so parents[3] is the repo root
+# (parents[0]=core, [1]=poc_valves, [2]=src, [3]=repo root).
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
 _CONFIG_DIR = _PROJECT_ROOT / "config"
 
 _SETTINGS_PATH = _CONFIG_DIR / "settings.yml"
 _PROMPTS_PATH = _CONFIG_DIR / "prompts.yml"
-_REFERENCE_PATH = _CONFIG_DIR / "reference.yml"
 
 
 # ---------------------------------------------------------------------------
@@ -48,6 +49,7 @@ def _load_yaml(path: Path) -> dict[str, Any]:
 
 
 _ENV_OVERRIDES: dict[str, str] = {
+    "REFERENCE_GUIDE_PATH": "reference_guide_path",
     "OPENAI_MODEL": "llm.model",
     "OPENAI_TEMPERATURE": "llm.temperature",
     "OPENAI_PROMPT_COST_PER_1K": "llm.prompt_cost_per_1k",
@@ -111,19 +113,14 @@ class _Settings:
 
     # Top-level keys
     @property
-    def reference_guide_path(self) -> str:
-        """Return the reference guide path from settings."""
-        return str(
+    def reference_guide_path(self) -> Path:
+        """Return the absolute path to the reference guide (field
+        registry) YAML file, resolved relative to the project root if the
+        configured path isn't already absolute."""
+        rp = Path(
             self._data.get("reference_guide_path", "config/reference.yml")
         )
-
-    @property
-    def reference_guide_abs_path(self) -> Path:
-        """Return the absolute path to the reference guide."""
-        rp = Path(self.reference_guide_path)
-        if rp.is_absolute():
-            return rp
-        return _PROJECT_ROOT / rp
+        return rp if rp.is_absolute() else _PROJECT_ROOT / rp
 
     # LLM sub-dict
     @property
@@ -265,9 +262,11 @@ def list_prompts() -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# Load reference fields from reference.yml
+# Load reference fields (path configurable via settings.yml's
+# reference_guide_path / the REFERENCE_GUIDE_PATH env var — see
+# _Settings.reference_guide_path).
 # ---------------------------------------------------------------------------
-_reference_raw: dict[str, Any] = _load_yaml(_REFERENCE_PATH)
+_reference_raw: dict[str, Any] = _load_yaml(settings.reference_guide_path)
 
 
 def load_reference_fields() -> list[dict[str, Any]]:

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 import logging
 import tempfile
 from pathlib import Path
@@ -9,18 +8,14 @@ try:
     from fastapi import FastAPI, File, HTTPException, UploadFile
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.responses import StreamingResponse
-    from openpyxl import Workbook
 except Exception as exc:  # pragma: no cover - optional dependency
     raise RuntimeError(
         "FastAPI is not installed. Install the 'api' extra to run the web application."
     ) from exc
 
-from .pdf.pdf_text import extract_pdf_text, extract_pdf_tables_for_page
-from .pipeline.sv2_pipeline import (
-    run_three_phase_pipeline,
-    DEFAULT_MODEL,
-    DEFAULT_TEMPERATURE,
-)
+from .core.excel import ExcelWriter
+from .core.pdf import extract_pdf_tables_for_page, extract_pdf_text
+from .core.pipeline import SV2Pipeline
 
 logger = logging.getLogger(__name__)
 
@@ -40,10 +35,11 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def _log_config() -> None:
+    pipeline = SV2Pipeline()
     logger.info(
         "Startup config — model: %s, temperature: %s",
-        DEFAULT_MODEL,
-        DEFAULT_TEMPERATURE,
+        pipeline.extractor.llm.model,
+        pipeline.extractor.llm.temperature,
     )
 
 
@@ -66,43 +62,6 @@ def _validate_pdf(pdf: UploadFile) -> None:
             status_code=400,
             detail=f"Only PDF files are accepted. Got content-type '{content_type}'.",
         )
-
-
-def _build_excel(parsed) -> io.BytesIO:
-    """Convert ParsedOutput into an Excel workbook and return as BytesIO.
-
-    Each extracted tag gets its own sheet named after its tag_no.
-    Columns: Sl.No | Feature name | Extracted feature value
-    """
-    wb = Workbook()
-
-    if not parsed.tags:
-        ws = wb.active
-        ws.title = "tags extracted"
-        ws.append(["Sl.No", "Feature name", "Extracted feature value"])
-        buf = io.BytesIO()
-        wb.save(buf)
-        buf.seek(0)
-        return buf
-
-    wb.remove(wb.active)
-    for tag in parsed.tags:
-        sheet_name = str(tag.tag_no) or "Unknown"
-        ws = wb.create_sheet(title=sheet_name[:31])
-
-        ws.append(["Sl.No", "Feature name", "Extracted feature value"])
-
-        field_values = tag.model_dump()
-        for sl, (field_name, value) in enumerate(
-            field_values.items(), start=1
-        ):
-            display_value = "" if value is None else value
-            ws.append([sl, field_name, display_value])
-
-    buf = io.BytesIO()
-    wb.save(buf)
-    buf.seek(0)
-    return buf
 
 
 @app.post("/extract-Tag-wise-Enquiry-pdf")
@@ -155,6 +114,7 @@ async def sv2_extract(
 
             total_text_chars = sum(len(p.get("text", "")) for p in pages)
             total_tables = sum(len(p.get("tables", [])) for p in pages)
+            pipeline = SV2Pipeline()
             logger.info(
                 "Sending %d page(s) with %d table(s) "
                 "(%d total text chars) to LLM "
@@ -162,15 +122,11 @@ async def sv2_extract(
                 total_pages,
                 total_tables,
                 total_text_chars,
-                DEFAULT_MODEL,
-                DEFAULT_TEMPERATURE,
+                pipeline.extractor.llm.model,
+                pipeline.extractor.llm.temperature,
             )
 
-            parsed = run_three_phase_pipeline(
-                pages,
-                guide=None,
-                debug=False,
-            )
+            parsed = pipeline.run(pages, guide=None)
 
             logger.info(
                 "LLM returned %d tag(s) from %s",
@@ -183,7 +139,7 @@ async def sv2_extract(
                 status_code=500, detail=str(exc)
             ) from exc
 
-    excel_buf = _build_excel(parsed)
+    excel_buf = ExcelWriter().build(parsed)
     output_filename = (
         Path(pdf.filename or "output").stem + "_tags_extracted.xlsx"
     )

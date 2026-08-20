@@ -1,13 +1,9 @@
-"""PDF structured extraction pipeline."""
+"""SV2 valve datasheet extraction pipeline."""
 
-from .models import DocumentResult, ExtractedField, FieldDefinition, PageArtifact, SchemaDefinition, ValidationIssue
+from .core.models import ParsedOutput, PartialSV2ValveDatasheet, SV2ValveDatasheet
 
 __all__ = [
-    "DocumentResult",
-    "ExtractedField",
-    "FieldDefinition",
-    "PageArtifact",
-    "SchemaDefinition",
-    "ValidationIssue",
+    "ParsedOutput",
+    "PartialSV2ValveDatasheet",
+    "SV2ValveDatasheet",
 ]
-

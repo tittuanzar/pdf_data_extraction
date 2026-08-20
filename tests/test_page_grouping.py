@@ -6,7 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from poc_valves.pipeline.sv2_pipeline import (
+from poc_valves.core.pipeline.sv2_pipeline import (
     _group_pages_by_tag,
     _merge_page_group,
     _normalize_decimal_commas,

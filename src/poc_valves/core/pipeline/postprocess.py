@@ -17,7 +17,7 @@ import logging
 import re
 from typing import Callable, Optional
 
-from ..pydantic_output import PartialSV2ValveDatasheet, SV2ValveDatasheet
+from ..models import PartialSV2ValveDatasheet, SV2ValveDatasheet
 
 logger = logging.getLogger(__name__)
 
