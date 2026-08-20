@@ -11,8 +11,8 @@ Usage::
     from poc_valves.config import settings, get_prompt
 
     reference_path = settings.reference_guide_path
-    system_msg = get_prompt("sv2_extraction_system")
-    user_msg = get_prompt("sv2_extraction_user", guide="...", pages_json="...")
+    system_msg = get_prompt("tags_extraction.system_prompt")
+    user_msg = get_prompt("tags_extraction.user_prompt", guide="...", pages_json="...")
 """
 
 from __future__ import annotations
@@ -32,6 +32,7 @@ _CONFIG_DIR = _PROJECT_ROOT / "config"
 
 _SETTINGS_PATH = _CONFIG_DIR / "settings.yml"
 _PROMPTS_PATH = _CONFIG_DIR / "prompts.yml"
+_REFERENCE_PATH = _CONFIG_DIR / "reference.yml"
 
 
 # ---------------------------------------------------------------------------
@@ -51,6 +52,7 @@ _ENV_OVERRIDES: dict[str, str] = {
     "OPENAI_TEMPERATURE": "llm.temperature",
     "OPENAI_PROMPT_COST_PER_1K": "llm.prompt_cost_per_1k",
     "OPENAI_COMPLETION_COST_PER_1K": "llm.completion_cost_per_1k",
+    "OPENAI_USD_TO_INR_RATE": "llm.usd_to_inr_rate",
     "POSTPROCESSING_USE_ENGINEERED_DEFAULTS": (
         "postprocessing.use_engineered_defaults"
     ),
@@ -112,7 +114,7 @@ class _Settings:
     def reference_guide_path(self) -> str:
         """Return the reference guide path from settings."""
         return str(
-            self._data.get("reference_guide_path", "reference_guide.xlsx")
+            self._data.get("reference_guide_path", "config/reference.yml")
         )
 
     @property
@@ -149,6 +151,12 @@ class _Settings:
         """Return the completion cost per 1k tokens."""
         return float(self.llm.get("completion_cost_per_1k", 0.0))
 
+    @property
+    def usd_to_inr_rate(self) -> float:
+        """Return the static USD -> INR conversion rate used for the Rs
+        figure shown alongside USD cost in logs."""
+        return float(self.llm.get("usd_to_inr_rate", 0.0))
+
     # Postprocessing sub-dict
     @property
     def postprocessing(self) -> dict[str, Any]:
@@ -176,33 +184,60 @@ settings = _Settings(_settings_raw)
 
 
 # ---------------------------------------------------------------------------
-# Load prompts
+# Load prompts (nested dict structure)
 # ---------------------------------------------------------------------------
 _prompts_raw: dict[str, Any] = _load_yaml(_PROMPTS_PATH)
 
-# Strip leading/trailing newlines from multiline prompt strings
-for _k, _v in _prompts_raw.items():
-    if isinstance(_v, str):
-        _prompts_raw[_k] = _v.strip("\n")
-
 _PLACEHOLDER_RE = re.compile(r"\{\{(\w+)\}\}")
+
+
+def _resolve_nested(data: dict, dotted_name: str) -> str | None:
+    """Traverse a nested dict using dot notation (e.g. 'tags_extraction.system_prompt')."""
+    keys = dotted_name.split(".")
+    current: Any = data
+    for key in keys:
+        if isinstance(current, dict) and key in current:
+            current = current[key]
+        else:
+            return None
+    return current if isinstance(current, str) else None
+
+
+def _collect_leaf_keys(data: dict, prefix: str = "") -> list[str]:
+    """Collect all leaf string values in a nested dict as dot-notation keys."""
+    leaves: list[str] = []
+    for key, value in data.items():
+        full_key = f"{prefix}.{key}" if prefix else key
+        if isinstance(value, dict):
+            leaves.extend(_collect_leaf_keys(value, full_key))
+        elif isinstance(value, str):
+            leaves.append(full_key)
+    return leaves
+
+
+_available_prompts: list[str] = _collect_leaf_keys(_prompts_raw)
 
 
 def get_prompt(name: str, **kwargs: str) -> str:
     """Return the prompt text for *name*, with ``{{placeholder}}``
     values substituted from *kwargs*.
 
+    Supports dot notation for nested prompts, e.g.
+    ``tags_extraction.system_prompt``.
+
     Raises ``KeyError`` if the prompt name does not exist in the YAML
     file. Raises ``ValueError`` if required placeholders are missing.
     """
-    if name not in _prompts_raw:
-        available = ", ".join(sorted(_prompts_raw.keys()))
+    text = _resolve_nested(_prompts_raw, name)
+
+    if text is None:
+        available = ", ".join(_available_prompts)
         raise KeyError(
             f"Prompt '{name}' not found in prompts.yml. "
             f"Available: {available}"
         )
 
-    text: str = _prompts_raw[name]
+    text = text.strip("\n")
 
     required = set(_PLACEHOLDER_RE.findall(text))
     provided = set(kwargs.keys())
@@ -225,5 +260,23 @@ def get_system_prompt(name: str, **kwargs: str) -> str:
 
 
 def list_prompts() -> list[str]:
-    """Return all available prompt names."""
-    return sorted(_prompts_raw.keys())
+    """Return all available prompt names (dot-notation for nested entries)."""
+    return sorted(_available_prompts)
+
+
+# ---------------------------------------------------------------------------
+# Load reference fields from reference.yml
+# ---------------------------------------------------------------------------
+_reference_raw: dict[str, Any] = _load_yaml(_REFERENCE_PATH)
+
+
+def load_reference_fields() -> list[dict[str, Any]]:
+    """Return the list of field definitions from reference.yml.
+
+    Each entry is a dict with keys: id, sv2_field_name, extraction_type,
+    requirement, unit, source (dict), logic, aliases, output_spec, etc.
+    """
+    fields = _reference_raw.get("document_extraction_fields", [])
+    if not isinstance(fields, list):
+        return []
+    return fields

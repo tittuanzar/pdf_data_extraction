@@ -2,70 +2,98 @@
 # poc-valves — LLM Prompt Templates
 # =============================================================================
 #
-# Each prompt is a named entry.  Use {{variable}} placeholders for values
-# that are filled in at runtime by the prompt loader (config.py).
-# Multiline strings use YAML block scalars (| for literal, > for folded).
+# Nested structure: each extraction type has a group with system_prompt and
+# user_prompt. Use {{variable}} placeholders for runtime substitution.
+# Access via dot notation: get_prompt("tags_extraction.system_prompt")
 # =============================================================================
 
 # ---------------------------------------------------------------------------
-# SV2 full-datasheet extraction (used by sv2_pipeline.extract_sv2_output_from_pages)
+# Tags extraction — SV2 full-datasheet extraction
+# Used by sv2_pipeline.extract_sv2_output_from_pages
 # ---------------------------------------------------------------------------
-sv2_extraction_system: |
-  You extract a valve datasheet into the exact ParsedOutput schema.
-  Return a top-level object with a 'tags' array. Each tag is one SV2ValveDatasheet.
-  Use the field names exactly as defined in the schema. For optional fields, use null when unknown.
-  Do not output markdown or any text outside the JSON object.
+tags_extraction:
+  system_prompt: |
+    You extract a valve datasheet into the exact ParsedOutput schema.
+    Return a top-level object with a 'tags' array. Each tag is one SV2ValveDatasheet.
+    Use the field names exactly as defined in the schema. For optional fields, use null when unknown.
+    Do not output markdown or any text outside the JSON object.
 
-sv2_extraction_user: |
-  Guide for extraction:
-  {{guide}}
+  user_prompt: |
+    Guide for extraction:
+    {{guide}}
 
-  Pages:
-  {{pages_json}}
-
-# ---------------------------------------------------------------------------
-# Per-page direct-field extraction (used by sv2_pipeline.extract_direct_fields_with_context)
-# ---------------------------------------------------------------------------
-direct_extraction_system: |
-  You extract field values verbatim from an engineering datasheet page.
-  Only report a value if you can point to where it appears — never infer
-  or calculate. If a field is not present on this page, set raw_value to null.
-  Include a short quote as evidence and the field's confidence.
-
-direct_extraction_user: |
-  {{guide_section}}
-  Extract these fields:
-  {{field_list}}
-
-  OCR text for this page:
-  {{page_text}}
-
-  {{tables_section}}
-  {{image_section}}
+    Pages:
+    {{pages_json}}
 
 # ---------------------------------------------------------------------------
-# Generic subcategory extraction (used by prompts.build_subcategory_prompt)
+# Data extraction — Per-page direct-field extraction
+# Used by sv2_pipeline.extract_direct_fields_with_context
 # ---------------------------------------------------------------------------
-subcategory_extraction_system: |
-  You extract fixed-format structured values from PDF source text.
-  Return only valid JSON. Never guess. Use null when a value cannot be found.
-  Provide source_page for every field.
+data_extraction:
+  system_prompt: |
+    You extract field values verbatim from an engineering datasheet page.
+    Only report a value if you can point to where it appears — never infer
+    or calculate. If a field is not present on this page, set raw_value to null.
+    Include a short quote as evidence and the field's confidence.
 
-subcategory_extraction_user: |
-  Document type: {{document_type}}
-  Schema version: {{schema_version}}
-  Subcategory: {{subcategory}}
+  user_prompt: |
+    {{guide_section}}
+    Extract these fields:
+    {{field_list}}
 
-  Extract only the following fields:
-  {{field_lines}}
+    OCR text for this page:
+    {{page_text}}
 
-  Document text with page markers:
-  {{document_text}}
+    {{tables_section}}
+    {{image_section}}
 
-  Return JSON in the form:
-  {
-    "subcategory": "...",
-    "fields": [
-      {"field_id": "...", "value": null, "source_page": 1, "confidence": 0.0, "notes": null}
-    ]
-  }
+# ---------------------------------------------------------------------------
+# Derived-field judgment — Phase 2 of the three-phase SV2 pipeline
+# Used by sv2_pipeline.derive_judgment_fields_llm
+# ---------------------------------------------------------------------------
+derived_field_judgment:
+  system_prompt: |
+    You compute a small set of judgment-based derived fields for one valve tag,
+    given its already-extracted direct field values, auxiliary raw source values,
+    and per-field derivation logic. Do not invent values unsupported by the input
+    or by standard engineering/vendor practice described in the logic. Use null
+    when a field genuinely cannot be determined from the given data.
+
+  user_prompt: |
+    Already-extracted direct fields for this tag:
+    {{direct_fields_json}}
+
+    Auxiliary raw source values (verbatim from the enquiry, not final SV2 fields):
+    {{auxiliary_fields_json}}
+
+    Derive ONLY the following fields, following the stated logic for each:
+    {{field_logic_block}}
+
+# ---------------------------------------------------------------------------
+# Subcategory extraction — Generic structured value extraction
+# Used by pipeline/prompts.build_subcategory_prompt
+# ---------------------------------------------------------------------------
+subcategory_extraction:
+  system_prompt: |
+    You extract fixed-format structured values from PDF source text.
+    Return only valid JSON. Never guess. Use null when a value cannot be found.
+    Provide source_page for every field.
+
+  user_prompt: |
+    Document type: {{document_type}}
+    Schema version: {{schema_version}}
+    Subcategory: {{subcategory}}
+
+    Extract only the following fields:
+    {{field_lines}}
+
+    Document text with page markers:
+    {{document_text}}
+
+    Return JSON in the form:
+    {
+      "subcategory": "...",
+      "fields": [
+        {"field_id": "...", "value": null, "source_page": 1, "confidence": 0.0, "notes": null}
+      ]
+    }

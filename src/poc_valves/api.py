@@ -17,7 +17,7 @@ except Exception as exc:  # pragma: no cover - optional dependency
 
 from .pdf.pdf_text import extract_pdf_text, extract_pdf_tables_for_page
 from .pipeline.sv2_pipeline import (
-    extract_sv2_output_from_pages,
+    run_three_phase_pipeline,
     DEFAULT_MODEL,
     DEFAULT_TEMPERATURE,
 )
@@ -166,7 +166,7 @@ async def sv2_extract(
                 DEFAULT_TEMPERATURE,
             )
 
-            parsed = extract_sv2_output_from_pages(
+            parsed = run_three_phase_pipeline(
                 pages,
                 guide=None,
                 debug=False,

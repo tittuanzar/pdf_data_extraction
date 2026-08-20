@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, create_model
 
 
 class SV2ValveDatasheet(BaseModel):
@@ -86,7 +86,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 7. Design Pressure (MAX)
-    design_pressure_max: float = Field(
+    design_pressure_max: str = Field(
         ...,
         description=(
             "Maximum design pressure in kgf/cm2(g), taken "
@@ -97,19 +97,18 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 8. Design Pressure (MIN)
-    design_pressure_min: Optional[float] = Field(
+    design_pressure_min: Optional[str] = Field(
         None,
         description=(
             "Minimum design pressure in kgf/cm2(g). Direct "
             "mapping, Mandatory where applicable (e.g. Full "
             "Vacuum case). Used with MAX to bound the pressure "
-            "class. Extract maximum design temperature from "
-            "Row 27 of table."
+            " Extract minimum design pressure from Row 27. FV= Full Vacuum = -1.033 kgf/cm²-a (or 0 absolute).Carry as 'FV' text if shown."
         ),
     )
 
     # 9. Design Temp (MAX)
-    design_temp_max: float = Field(
+    design_temp_max: str = Field(
         ...,
         description=(
             "Maximum design temperature in degrees C, copied "
@@ -120,7 +119,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 10. Design Temp (MIN) / MDMT
-    design_temp_min_mdmt: float = Field(
+    design_temp_min_mdmt: str = Field(
         ...,
         description=(
             "Minimum design metal temperature (MDMT), often "
@@ -131,7 +130,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 11. Flow Rate (MAX)
-    flow_rate_max: float = Field(
+    flow_rate_max: str = Field(
         ...,
         description=(
             "Maximum flow rate (units per enquiry, e.g. m3/h, "
@@ -142,7 +141,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 12. Flow Rate (NOR)
-    flow_rate_nor: float = Field(
+    flow_rate_nor: str = Field(
         ...,
         description=(
             "Normal flow rate, same source/units as Flow Rate "
@@ -153,7 +152,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 13. Flow Rate (MIN)
-    flow_rate_min: float = Field(
+    flow_rate_min: str = Field(
         ...,
         description=(
             "Minimum flow rate, same source/units as Flow Rate "
@@ -163,7 +162,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 14. Inlet Pressure (MAX)
-    inlet_pressure_max: float = Field(
+    inlet_pressure_max: str = Field(
         ...,
         description=(
             "Maximum inlet (upstream) pressure in kgf/cm2(g), "
@@ -173,7 +172,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 15. Inlet Pressure (NOR)
-    inlet_pressure_nor: float = Field(
+    inlet_pressure_nor: str = Field(
         ...,
         description=(
             "Normal inlet pressure in kgf/cm2(g), same source "
@@ -183,7 +182,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 16. Inlet Pressure (MIN)
-    inlet_pressure_min: float = Field(
+    inlet_pressure_min: str = Field(
         ...,
         description=(
             "Minimum inlet pressure in kgf/cm2(g), same source "
@@ -193,7 +192,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 17. Outlet Pressure (MAX)
-    outlet_pressure_max: Optional[float] = Field(
+    outlet_pressure_max: Optional[str] = Field(
         None,
         description=(
             "Maximum outlet (downstream) pressure in "
@@ -204,7 +203,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 18. Outlet Pressure (NOR)
-    outlet_pressure_nor: Optional[float] = Field(
+    outlet_pressure_nor: Optional[str] = Field(
         None,
         description=(
             "Normal outlet pressure in kgf/cm2(g). Derived "
@@ -214,7 +213,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 19. Outlet Pressure (MIN)
-    outlet_pressure_min: Optional[float] = Field(
+    outlet_pressure_min: Optional[str] = Field(
         None,
         description=(
             "Minimum outlet pressure in kgf/cm2(g). Derived "
@@ -224,7 +223,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 20. Pressure Drop (MAX)
-    pressure_drop_max: float = Field(
+    pressure_drop_max: str = Field(
         ...,
         description=(
             "Maximum pressure drop across the valve in "
@@ -235,7 +234,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 21. Pressure Drop (NOR)
-    pressure_drop_nor: float = Field(
+    pressure_drop_nor: str = Field(
         ...,
         description=(
             "Normal pressure drop across the valve in kgf/cm2, "
@@ -245,7 +244,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 22. Pressure Drop (MIN)
-    pressure_drop_min: float = Field(
+    pressure_drop_min: str = Field(
         ...,
         description=(
             "Minimum pressure drop across the valve in "
@@ -255,7 +254,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 23. Temperature (MAX)
-    temperature_max: float = Field(
+    temperature_max: str = Field(
         ...,
         description=(
             "Maximum operating (inlet) fluid temperature in "
@@ -266,7 +265,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 24. Temperature (NOR)
-    temperature_nor: float = Field(
+    temperature_nor: str = Field(
         ...,
         description=(
             "Normal operating fluid temperature in degrees C, "
@@ -276,7 +275,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 25. Temperature (MIN)
-    temperature_min: float = Field(
+    temperature_min: str = Field(
         ...,
         description=(
             "Minimum operating fluid temperature in degrees C, "
@@ -286,7 +285,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 26. Specific Gravity / Molecular Weight
-    specific_gravity_or_molecular_weight: float = Field(
+    specific_gravity_or_molecular_weight: str = Field(
         ...,
         description=(
             "Specific gravity (liquid, relative to water) or "
@@ -294,11 +293,12 @@ class SV2ValveDatasheet(BaseModel):
             "read from the enquiry's density/MW table depending "
             "on fluid phase. Derived; for liquids, spec. gravity "
             "affects the Fp/Fl sizing factors."
+            ""
         ),
     )
 
     # 27. Viscosity
-    viscosity: float = Field(
+    viscosity: str = Field(
         ...,
         description=(
             "Fluid viscosity, extracted from the enquiry (only "
@@ -309,7 +309,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 28. Compressibility Factor (Z)
-    compressibility_factor_z: Optional[float] = Field(
+    compressibility_factor_z: Optional[str] = Field(
         None,
         description=(
             "Gas compressibility factor Z (dimensionless, "
@@ -323,7 +323,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 29. Specific Heats Ratio (K)
-    specific_heats_ratio_k: Optional[float] = Field(
+    specific_heats_ratio_k: Optional[str] = Field(
         None,
         description=(
             "Ratio of specific heats, gamma (liquid = N/A), "
@@ -335,7 +335,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 30. Vapour Pressure
-    vapour_pressure: Optional[float] = Field(
+    vapour_pressure: Optional[str] = Field(
         None,
         description=(
             "Fluid vapour pressure in kgf/cm2(a), extracted "
@@ -500,7 +500,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 44. Supply Pressure
-    supply_pressure: float = Field(
+    supply_pressure: str = Field(
         ...,
         description=(
             "Available instrument air/supply pressure in "
@@ -526,7 +526,7 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 46. Shut-off Pressure
-    shut_off_pressure: Optional[float] = Field(
+    shut_off_pressure: Optional[str] = Field(
         None,
         description=(
             "Differential pressure the actuator must shut off "
@@ -787,6 +787,25 @@ class ParsedOutput(BaseModel):
     """Parsed output containing multiple valve datasheets."""
 
     tags: list[SV2ValveDatasheet]
+
+
+PartialSV2ValveDatasheet = create_model(
+    "PartialSV2ValveDatasheet",
+    __base__=BaseModel,
+    **{
+        name: (Optional[field.annotation], None)
+        for name, field in SV2ValveDatasheet.model_fields.items()
+    },
+)
+"""Every SV2ValveDatasheet field made Optional, defaulting to None.
+
+The three-phase pipeline (direct extraction -> derived-field computation ->
+engineered defaults) fills in a tag incrementally; SV2ValveDatasheet's
+required fields express the final, fully-processed output contract and
+should not be relaxed for that. This partial model is the type that flows
+through phases 1-3; SV2ValveDatasheet itself is only constructed once, at
+the end, via sv2_pipeline._finalize_tag.
+"""
 
 
 if __name__ == "__main__":

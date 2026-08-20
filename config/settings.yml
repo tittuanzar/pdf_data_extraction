@@ -2,24 +2,33 @@
 # poc-valves — Application Settings
 # =============================================================================
 
-# Path to the reference guide Excel file used for field mapping.
+# Path to the reference guide file used for field mapping.
 # This is resolved relative to the project root directory.
-reference_guide_path: "reference_guide.xlsx"
+reference_guide_path: "config/reference.yml"
 
 # OpenAI / LLM defaults (also overridable via environment variables)
 llm:
-  model: "gpt-4.1-mini-2025-04-14"                       # overridden by OPENAI_MODEL env var
+  model: "gpt-4.1-mini-2025-04-14"        # overridden by OPENAI_MODEL env var
   temperature: 0.01                       # overridden by OPENAI_TEMPERATURE env var
-  prompt_cost_per_1k: 0.0                # cost per 1000 prompt tokens ($)
-  completion_cost_per_1k: 0.0            # cost per 1000 completion tokens ($)
+  # GPT-4.1 mini pricing (per OpenAI's pricing page): $0.40 / 1M input
+  # tokens, $1.60 / 1M output tokens. Update these if the model or its
+  # pricing changes.
+  prompt_cost_per_1k: 0.0004             # cost per 1000 prompt tokens ($) — overridden by OPENAI_PROMPT_COST_PER_1K env var
+  completion_cost_per_1k: 0.0016         # cost per 1000 completion tokens ($) — overridden by OPENAI_COMPLETION_COST_PER_1K env var
+  # Static USD -> INR conversion rate used only for the Rs figure shown
+  # alongside the USD cost in logs. Not a live rate — update as needed.
+  usd_to_inr_rate: 87.0                  # overridden by OPENAI_USD_TO_INR_RATE env var
 
 # Postprocessing: apply engineered defaults and derived-field logic after
 # LLM extraction.  Set to false to skip (useful for debugging LLM-only output).
 postprocessing:
   use_engineered_defaults: false     # apply KSB MIL defaults for Engineered fields
 
-# Which prompt keys to use (referencing names in prompts.yml)
+# Which prompt keys to use (referencing names in prompts.yml, dot notation)
 prompt_keys:
-  sv2_extraction_system: "sv2_extraction_system"
-  sv2_extraction_user: "sv2_extraction_user"
-  direct_extraction_system: "direct_extraction_system"
+  tags_extraction_system: "tags_extraction.system_prompt"
+  tags_extraction_user: "tags_extraction.user_prompt"
+  data_extraction_system: "data_extraction.system_prompt"
+  data_extraction_user: "data_extraction.user_prompt"
+  subcategory_extraction_system: "subcategory_extraction.system_prompt"
+  subcategory_extraction_user: "subcategory_extraction.user_prompt"
