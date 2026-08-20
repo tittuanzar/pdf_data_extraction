@@ -97,3 +97,60 @@ subcategory_extraction:
         {"field_id": "...", "value": null, "source_page": 1, "confidence": 0.0, "notes": null}
       ]
     }
+
+evaluation_tag_wise:
+  system_prompt: |
+    You are evaluating an AI extraction pipeline's output against ground-truth data in an Excel workbook.
+
+    INPUT FORMAT
+    Each sheet represents one tag/record. Each sheet has these columns:
+    - Sl.No: row identifier
+    - Feature name: the field being extracted
+    - Extracted feature value: what the extraction pipeline produced
+    - Ground Truth: the correct/reference value
+
+    TASK
+    For every row on every sheet, compare "Extracted feature value" against "Ground Truth" and classify the match as one of:
+
+    1. EXACT — identical value/meaning. Ignore leading/trailing whitespace, line breaks vs spaces, and trivial symbol variants (e.g. ° vs º, "2" vs "²" as a unit exponent).
+
+    2. CLOSE — same underlying value or meaning, but differs in:
+      - formatting/notation (e.g. "3 in STD" vs "3 in/STD", "0.2" vs "0.20 kgf/cm²")
+      - abbreviation or paraphrase that preserves meaning (e.g. "FTC (Flow-To-Close)" vs "Flow to close")
+      - extra/missing qualifier text that doesn't change the core value (e.g. "12 kgf/cm²-g" vs "12 kgf/cm² (Tag1)")
+      - rounding or unit-prefix differences that clearly refer to the same quantity
+
+    3. WRONG / MISSING — one of:
+      - the two values contradict each other or refer to materially different things (e.g. a different material grade, a different numeric value)
+      - one side is blank/None while the other has a real, substantive value
+      - the extraction says "NOT EXTRACTED" or is empty while ground truth has a value (or vice versa)
+
+    RULE: If BOTH the extracted value and ground truth are blank/None for a field, count that as EXACT (correctly and consistently blank), not as missing.
+
+    OUTPUT
+    1. A per-sheet count of Exact / Close / Wrong, plus total fields per sheet.
+    2. Two accuracy metrics per sheet and overall:
+      - Exact-match accuracy = Exact / Total
+      - Exact+Close accuracy = (Exact + Close) / Total
+    3. A short list of the systematic/recurring issues you noticed (e.g. a field that's wrong across all tags, or a field where ground truth appears incomplete rather than the extraction being wrong).
+    4. Produce an annotated copy of the workbook with a new "Match Type" column (color-coded: green=Exact, yellow=Close, red=Wrong) on each sheet, plus a Summary sheet with the counts/percentages as live formulas.
+
+    If given a revised version of the file later (updated ground truth or updated extraction), only report what changed since the previous run and recompute the accuracy deltas — don't redo the full narrative from scratch.
+
+  user_prompt: |
+    Document type: {{document_type}}
+    Schema version: {{schema_version}}
+    Subcategory: {{subcategory}}
+
+    Evaluate only the following fields:
+    {{field_lines}}
+
+    Document text with page markers:
+    {{document_text}}
+
+    Return JSON in the form:
+    {
+      "evaluation": [
+        {"field_id": "...", "value": null, "source_page": 1, "confidence": 0.0, "notes": null}
+      ]
+    }

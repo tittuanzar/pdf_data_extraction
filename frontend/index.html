@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
   <div class="app">
@@ -15,11 +15,7 @@
     <header class="header">
       <div class="header-inner">
         <div class="logo">
-          <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="8" fill="#2563EB"/>
-            <path d="M9 10h4v12H9zM13 8h4v16h-4zM17 11h4v10h-4z" fill="#fff" opacity=".9"/>
-          </svg>
-          <span class="logo-text">ValveSpec</span>
+          <img class="logo-img" src="logo.png" alt="Simelabs">
         </div>
         <span class="badge">PDF Extractor</span>
       </div>
@@ -29,7 +25,17 @@
 
       <div class="hero">
         <h1>Extract Valve Datasheets</h1>
-        <p>Upload a Tag-wise Enquiry PDF. Get structured Excel output automatically.</p>
+        <p id="hero-sub">Upload a Tag-wise Enquiry PDF. Get structured Excel output automatically.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="doc-type">Document Type</label>
+        <select id="doc-type" class="select">
+          <option value="tagwise" selected>Tag-wise Document</option>
+          <option value="generic">Generic Document</option>
+          <option value="config">Upload Extraction Configuration</option>
+        </select>
+        <p id="mode-hint" class="field-hint hidden"></p>
       </div>
 
       <div class="card">
@@ -66,17 +72,25 @@
 
       <button class="btn btn-primary btn-full" id="extract-btn" disabled>
         <svg class="btn-ico" viewBox="0 0 20 20" fill="none"><path d="M10 3v10m0 0l-4-4m4 4l4-4M4 17h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Extract to Excel
+        <span id="extract-btn-label">Extract to Excel</span>
       </button>
 
       <div id="state-progress" class="state hidden">
         <div class="card state-card">
           <div class="state-row">
-            <div class="spinner"></div>
+            <div class="scan-doc">
+              <svg class="scan-doc-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#2563EB" stroke-width="1.5"/>
+                <path d="M14 2v6h6" stroke="#2563EB" stroke-width="1.5"/>
+                <path d="M8 13h8M8 16.5h5" stroke="#93C5FD" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+              <div class="scan-line"></div>
+            </div>
             <div>
-              <p class="state-title" id="prog-title">Uploading PDF...</p>
+              <p class="state-title" id="prog-title">Processing PDF...</p>
               <p class="state-sub" id="prog-sub">Sending file to extraction service</p>
             </div>
+            <span class="dot-loader" aria-hidden="true"><span></span><span></span><span></span></span>
           </div>
           <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
         </div>
@@ -100,7 +114,7 @@
           <div class="state-row">
             <svg class="state-ico" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/><path d="M13 20l4.5 4.5L27 15" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <div>
-              <p class="state-title state-title--done">Extraction Complete</p>
+              <p class="state-title state-title--done" id="done-title">Extraction Complete</p>
               <p class="state-sub state-sub--done" id="done-msg"></p>
             </div>
           </div>
@@ -121,6 +135,6 @@
     </footer>
 
   </div>
-  <script src="app.js"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
