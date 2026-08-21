@@ -18,7 +18,7 @@ llm:
   completion_cost_per_1k: 0.0016         # cost per 1000 completion tokens ($) — overridden by OPENAI_COMPLETION_COST_PER_1K env var
   # Static USD -> INR conversion rate used only for the Rs figure shown
   # alongside the USD cost in logs. Not a live rate — update as needed.
-  usd_to_inr_rate: 87.0                  # overridden by OPENAI_USD_TO_INR_RATE env var
+  usd_to_inr_rate: 94.2                  # overridden by OPENAI_USD_TO_INR_RATE env var
   # Max number of tag-wise Phase 1/2 LLM calls the SV2 pipeline issues
   # concurrently (each tag's page group is independent). Overridden by
   # the SV2_LLM_MAX_CONCURRENCY env var.
@@ -27,7 +27,7 @@ llm:
 # Postprocessing: apply engineered defaults and derived-field logic after
 # LLM extraction.  Set to false to skip (useful for debugging LLM-only output).
 postprocessing:
-  use_engineered_defaults: false     # apply KSB MIL defaults for Engineered fields
+  use_engineered_defaults: true     # apply KSB MIL defaults for Engineered fields
 
 # Which prompt keys to use (referencing names in prompts.yml, dot notation)
 prompt_keys:

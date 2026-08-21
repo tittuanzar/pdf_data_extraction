@@ -418,7 +418,7 @@ def derive_ndt_igc_test(
     return "Not Applicable"
 
 
-def derive_peso_certificate(aux: dict) -> Optional[bool]:
+def derive_peso_certificate(aux: dict) -> Optional[str]:
     """Derive PESO Certificate (serial 66).
 
     Reference guide logic: a PESO certificate is required for all
@@ -428,7 +428,9 @@ def derive_peso_certificate(aux: dict) -> Optional[bool]:
     src = (aux.get("raw_area_classification") or "").strip().lower()
     if not src:
         return None
-    return "zone" in src
+    if "zone" in src:
+        return "PESO Certificate for All Electrical Accessories"
+    return "PESO Certificate Not Required"
 
 
 # Derived fields (serials 62, 63, 65) that carry an industry-standard

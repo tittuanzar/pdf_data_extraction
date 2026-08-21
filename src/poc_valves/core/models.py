@@ -700,12 +700,15 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 61. IBR Applicability
-    ibr_applicability: Optional[bool] = Field(
+    ibr_applicability: Optional[str] = Field(
         None,
         description=(
             "Whether Indian Boiler Regulations (IBR) "
             "certification applies, derived from the process "
-            "fluid/steam service (Boiler Form IIIC). "
+            "fluid/steam service (Boiler Form IIIC). Holds the "
+            "actual message, not a boolean: 'IBR applies. Valve "
+            "must be tested and certified by IBR per Appendix "
+            "L.' when applicable, otherwise 'IBR Not Required'. "
             "Conditional; when applicable, IBR certificate is "
             "required during manufacturing and can add several "
             "weeks to the delivery schedule."
@@ -758,15 +761,18 @@ class SV2ValveDatasheet(BaseModel):
     )
 
     # 66. PESO Certificate
-    peso_certificate: Optional[bool] = Field(
+    peso_certificate: Optional[str] = Field(
         None,
         description=(
             "Whether a PESO (Petroleum and Explosives Safety "
             "Organisation) certificate is required, derived "
             "from the hazardous-area classification "
-            "(Zone 1 Gr. IIC). Conditional; PESO certificate "
-            "must be added and can add roughly 4-6 weeks to "
-            "the delivery schedule."
+            "(Zone 1 Gr. IIC). Holds the actual message, not a "
+            "boolean: 'PESO Certificate for All Electrical "
+            "Accessories' when applicable, otherwise 'PESO "
+            "Certificate Not Required'. Conditional; PESO "
+            "certificate must be added and can add roughly 4-6 "
+            "weeks to the delivery schedule."
         ),
     )
 

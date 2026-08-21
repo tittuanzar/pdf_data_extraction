@@ -156,7 +156,7 @@ class DerivedJudgmentFields(BaseModel):
     positioner_certification: Optional[str] = None
     position_transmitter: Optional[str] = None
     airset_make_model_qty: Optional[str] = None
-    ibr_applicability: Optional[bool] = None
+    ibr_applicability: Optional[str] = None
 
 
 # Row 1 of the enquiry DS lays out "Tag No." | "PID" | <value> | <P&ID doc
