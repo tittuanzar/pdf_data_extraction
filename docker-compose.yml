@@ -7,10 +7,18 @@ services:
       - "8000:8000"
     environment:
       PYTHONUNBUFFERED: "1"
+      REDIS_HOST: "redis"
+    depends_on:
+      - redis
     volumes:
       - .env:/app/.env
       - ./:/app
-    command: ["uv", "run", "uvicorn", "poc_valves.api:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    command: ["uv", "run", "uvicorn", "poc_valves.api:create_app", "--host", "0.0.0.0", "--port", "8000"]
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
 
   frontend:
     build:

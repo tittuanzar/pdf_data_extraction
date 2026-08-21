@@ -23,14 +23,15 @@
                                  │
               ┌──────────────────┼──────────────────┐
               ▼                  ▼                   ▼
-   ┌─────────────────┐ ┌────────────────┐ ┌────────────────────┐
-   │  PDF EXTRACTION  │ │  LLM PIPELINE  │ │  EXCEL GENERATION  │
-   │   (pdfplumber)   │ │  (OpenAI GPT)  │ │    (openpyxl)      │
-   └────────┬────────┘ └───────┬────────┘ └─────────┬──────────┘
-            │                  │                     │
-            ▼                  ▼                     ▼
-    Pages + Tables     ParsedOutput            .xlsx download
-    (per page)         (list of tags)          (per-tag sheets)
+   ┌──────────────────┐ ┌────────────────────────────┐ ┌────────────────────┐
+   │  PDF EXTRACTION  │ │   LLM PIPELINE (3-phase)   │ │  EXCEL GENERATION  │
+   │   (pdfplumber)   │ │  (OpenAI GPT → tags list)  │ │     (openpyxl)     │
+   └─────────┬────────┘ └──────────────┬─────────────┘ └──────────┬─────────┘
+             │                         │                          │
+             ▼                         ▼                          ▼
+      Pages + Tables ParsedOutput.tags: [Tag1, Tag2, ...]  .xlsx download
+        (per page)    (LLM parses grouped pages into one  (per-tag sheets)
+                       SV2ValveDatasheet per tag found)
 ```
 
 ---
@@ -57,7 +58,7 @@ UploadFile (pdf)
       tmpdir/upload.pdf     (bytes written to temp file)
 ```
 
-**Source:** `src/poc_valves/api.py:37-51`
+**Source:** `src/poc_valves/api.py:46-64` (`_validate_pdf`)
 
 ---
 
@@ -101,33 +102,43 @@ upload.pdf
     └──────────────────────────────────────────────────┘
 ```
 
-**Source:** `src/poc_valves/pdf/pdf_text.py`  
-**Called from:** `src/poc_valves/api.py:94-104`
+**Source:** `src/poc_valves/core/pdf/parser.py` (`PdfParser` class)  
+**Called from:** `src/poc_valves/api.py:85-113`
 
 ---
 
-### Stage 3 — LLM Structured Extraction (OpenAI GPT-4o)
+### Stage 3 — Three-Phase LLM Extraction (OpenAI, structured output)
+
+`SV2Pipeline.run(pages)` groups pages into per-tag page groups first (a
+tag's "main" datasheet page plus its continuation page(s), matched by
+regex), then runs three phases per tag group:
 
 ```
 pages (list of dicts)
     │
     ▼
-extract_sv2_output_from_pages(pages)
+_group_pages_by_tag(pages) ──► [[main, continuation, ...], ...]  (one group per tag)
     │
-    │  Builds OpenAI request:
-    │    • System prompt: "You extract a valve datasheet..."
-    │    • User content: JSON dump of all pages (text + tables)
-    │    • response_format = ParsedOutput (structured output)
+    ▼  for each tag group: _merge_page_group() → single merged page dict
+    │
+    ├─ Phase 1 — SV2FieldExtractor.extract_page(page)
+    │     LLM call, response_format=PageExtraction
+    │     → direct_values (66-field attrs) + aux_values (raw_* enquiry values)
+    │
+    ├─ Phase 2 — derived fields
+    │     2a. postprocess.apply_pre_llm_derivations()   deterministic rules
+    │     2b. SV2FieldExtractor.derive_judgment_fields() LLM call, response_format=DerivedJudgmentFields
+    │         (11 judgment-based fields: positioner selection, MDMT, IBR, ...)
+    │     2c. postprocess.apply_post_llm_derivations()  deterministic rules depending on 2b's output
+    │
+    ├─ Phase 3 — postprocess.apply_engineered_defaults()
+    │     Org-standard defaults for fields never present in the enquiry PDF
+    │     (painting scheme, cable gland type, positioner type, bench range, guiding)
+    │
+    └─ _finalize_tag() → SV2ValveDatasheet (validates; missing required
+                          fields become "NOT EXTRACTED" placeholders, logged)
     │
     ▼
-┌──────────────────────────────────────────────────────┐
-│              OpenAI GPT-4o API                       │
-│                                                      │
-│  Input:  System msg + Pages JSON                     │
-│  Output: ParsedOutput (Pydantic structured response) │
-└──────────────────────────┬───────────────────────────┘
-                           │
-                           ▼
 ┌──────────────────────────────────────────────────────┐
 │                   ParsedOutput                       │
 │                                                      │
@@ -148,8 +159,8 @@ extract_sv2_output_from_pages(pages)
 └──────────────────────────────────────────────────────┘
 ```
 
-**Source:** `src/poc_valves/pipeline/sv2_pipeline.py:160-216`  
-**Model:** `src/poc_valves/pydantic_output.py` (66 fields per tag)
+**Source:** `src/poc_valves/core/pipeline/sv2_pipeline.py` (`SV2Pipeline.run`, page grouping/merging) + `src/poc_valves/core/llm/extractor.py` (`SV2FieldExtractor`, the two LLM calls) + `src/poc_valves/core/pipeline/postprocess.py` (deterministic derivation/defaults)  
+**Model:** `src/poc_valves/core/models.py` (66 fields per tag)
 
 ---
 
@@ -159,7 +170,7 @@ extract_sv2_output_from_pages(pages)
 ParsedOutput
     │
     ▼
-_build_excel(parsed)
+ExcelWriter().build(parsed)
     │
     │  For each tag in parsed.tags:
     │    • Create sheet named after tag_no (max 31 chars)
@@ -187,7 +198,7 @@ _build_excel(parsed)
          Content-Disposition: attachment; filename="file_tags_extracted.xlsx"
 ```
 
-**Source:** `src/poc_valves/api.py:54-77`
+**Source:** `src/poc_valves/core/excel.py` (`ExcelWriter.build`), called from `src/poc_valves/api.py:142`
 
 ---
 
@@ -217,7 +228,12 @@ Client                    Server                        External
   │                   │ extract_tables │                   │
   │                   └─────┬──────────┘                   │
   │                         │                              │
-  │                         │  pages[]                     │
+  │                   ┌─────┴──────────┐                   │
+  │                   │ SV2Pipeline    │                   │
+  │                   │  .run(pages)   │                   │
+  │                   │ (3 phases,     │                   │
+  │                   │  per tag group)│                   │
+  │                   └─────┬──────────┘  pages[] per phase │
   │                         │ ───────────────────────────► │
   │                         │         OpenAI GPT-4o        │
   │                         │   (structured output)        │
@@ -225,7 +241,8 @@ Client                    Server                        External
   │                         │        ParsedOutput          │
   │                   ┌─────┴──────────┐                   │
   │                   │ openpyxl       │                   │
-  │                   │ _build_excel() │                   │
+  │                   │ ExcelWriter    │                   │
+  │                   │  .build()      │                   │
   │                   └─────┬──────────┘                   │
   │                         │                              │
   │  StreamingResponse      │                              │
@@ -239,34 +256,33 @@ Client                    Server                        External
 
 ```
 src/poc_valves/
-├── api.py                     FastAPI endpoint + Excel builder
-├── pydantic_output.py         SV2ValveDatasheet (66 fields) + ParsedOutput
-├── export.py                  Generic JSON/CSV/XLSX exporters
-├── models.py                  Dataclass models (DocumentResult, etc.)
+├── api.py                          FastAPI endpoint — routes only, delegates to core/
 │
-├── pipeline/
-│   ├── sv2_pipeline.py        LLM extraction (GPT-4o structured output)
-│   ├── pipeline.py            Generic schema-driven pipeline (unused)
-│   ├── llm.py                 ExtractionClient ABC + mock
-│   ├── prompts.py             Prompt builders
-│   ├── service.py             Heuristic regex extraction
-│   └── validation.py          Type coercion + validation
-│
-├── pdf/
-│   ├── pdf_text.py            pdfplumber text & table extraction
-│   └── preprocess.py          PyMuPDF + pdfplumber preprocessing
-│
-├── schema/
-│   ├── schema.py              Schema loading & validation
-│   └── output_model.py        Dynamic Pydantic model from Excel
+├── core/
+│   ├── config.py                   Settings loader (class _Settings) + prompt loading
+│   ├── models.py                   SV2ValveDatasheet (66 fields) + ParsedOutput + PartialSV2ValveDatasheet
+│   ├── excel.py                    ExcelWriter — builds the per-tag workbook
+│   │
+│   ├── pdf/
+│   │   └── parser.py               PdfParser — pdfplumber text & table extraction
+│   │
+│   ├── llm/
+│   │   ├── client.py               LLMClient — OpenAI client + chat_parse() (usage/cost accounting)
+│   │   └── extractor.py            SV2FieldExtractor — Phase 1 direct-field + Phase 2 judgment-field LLM calls
+│   │
+│   └── pipeline/
+│       ├── sv2_pipeline.py         SV2Pipeline — three-phase orchestration (page grouping, phases 1-3)
+│       └── postprocess.py          Deterministic derive_* rules + engineered defaults
 │
 └── field_mapping_register/
-    ├── models.py              Field-mapping dataclasses
-    ├── extract_pdf_text.py    PDF text extraction (field-mapping)
-    ├── llm_extract_rows.py    OpenAI row extraction (gpt-4.1)
-    ├── build_excel.py         openpyxl writer for field-mapping
-    └── runner.py              CLI runner (extract → merge → Excel)
+    ├── models.py                   Field-mapping dataclasses
+    ├── extract_pdf_text.py         PDF text extraction (field-mapping)
+    ├── llm_extract_rows.py         OpenAI row extraction (gpt-4.1)
+    ├── build_excel.py              openpyxl writer for field-mapping
+    └── runner.py                   CLI runner (extract → merge → Excel) — standalone tool, not used by api.py
 ```
+
+`field_mapping_register/` is a separate, self-contained CLI utility unrelated to the FastAPI endpoint above; it has its own tests and is not part of the request lifecycle described in this document.
 
 ---
 
