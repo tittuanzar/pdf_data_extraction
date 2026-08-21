@@ -5,7 +5,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Tag No. (Row 1)
+    enquiry_field_name: Tag No.
     example_value: 1803-FV-10401 | 1803-FV-1104 | 1803-FV- 1403
   logic: Copy tag number verbatim from the tag number field at the top of the Enquiry DS.
   example_output: 1803-FV-10401 | 1803-FV-1104 | 1803- FV-1403
@@ -15,16 +15,15 @@ document_extraction_fields:
   aliases: Tag Number; Instrument Tag; Tag ID; FV Tag
   similar_values_reference: FV-XXXX; CV-XXXX; HCV-XXXX
   output_spec:
-    sv2_spec_row: Header
     sv2_spec_field_name: Tag No
-  notes: 'Tag number must match the P&ID reference in Row 1. Format: Plant-Instrument-Number.'
+  notes: 'Tag number must match the P&ID reference. Format: Plant-Instrument-Number.'
 - id: 2
   sv2_field_name: Service
   extraction_type: direct
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Service (Row 2)
+    enquiry_field_name: Service
     example_value: SUSPECT CONDT PUMPS(P-606A/B) MCF | LP STEAM TO E-101 PREHEATER | RCSP HOPPER R-104
       AERATION PLANT AIR
   logic: Copy service description verbatim from the Service field of the Enquiry DS.
@@ -36,7 +35,6 @@ document_extraction_fields:
   aliases: Service Description; Valve Duty; Application
   similar_values_reference: —
   output_spec:
-    sv2_spec_row: Row 1
     sv2_spec_field_name: Service
   notes: May include equipment tag number in parentheses. Carry forward exactly as written.
 - id: 3
@@ -45,7 +43,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Process Fluid (Row 14)
+    enquiry_field_name: Process Fluid
     example_value: SUSPECT LP CONDENSATE | LP Steam | PLANT AIR
   logic: Copy fluid name from the Process Fluid field of the Enquiry DS.
   example_output: SUSPECT LP CONDENSATE | Steam | Air
@@ -55,17 +53,15 @@ document_extraction_fields:
   aliases: Process Fluid; Fluid; Medium; Service Fluid
   similar_values_reference: Water; Condensate; Steam; LP Steam; Plant Air; Nitrogen; Propylene
   output_spec:
-    sv2_spec_row: Row 2
     sv2_spec_field_name: Fluid Name
-  notes: Fluid name determines the sizing equation set (liquid, steam, or gas). Cross-check with Row 15
-    (Upstream Condition) for consistency.
+  notes: Fluid name determines the sizing equation set (liquid, steam, or gas). Cross-check with the Upstream Condition field for consistency.
 - id: 4
   sv2_field_name: Fluid Phase
   extraction_type: derived
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Upstream Condition (Row 15)
+    enquiry_field_name: Upstream Condition
     example_value: Water | Steam | Gas/Vapor
   logic: 'Map the Upstream Condition value to Sv2 dropdown: Water/Liquid/Condensate → Liquid; Steam/LP Steam/HP Steam → Steam; Gas/Vapor/Air/Nitrogen → Gas.'
   example_output: Liquid | Steam | Gas
@@ -75,7 +71,6 @@ document_extraction_fields:
   aliases: State; Phase; Fluid State; Condition
   similar_values_reference: Liquid; Vapour; Gas; Steam; Two- Phase
   output_spec:
-    sv2_spec_row: Row 3
     sv2_spec_field_name: Fluid Phase
   notes: This selection determines the entire sizing equation path in Solutioneer. An incorrect phase
     will give a completely wrong Cv result.
@@ -85,7 +80,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: in / Schedule
   source:
-    enquiry_field_name: Line Size and Schedule — Inlet (Row 11)
+    enquiry_field_name: Line Size and Schedule — Inlet
     example_value: 3 in STD | 12 in XS | 6 in STD
   logic: Extract inlet size and schedule from the Line Size and Schedule (Inlet) field. Parse leading number as nominal size; schedule follows (STD, XS, 40S etc.)
   example_output: 3 in/STD | 12 in/XS | 6 in/STD
@@ -95,17 +90,15 @@ document_extraction_fields:
   aliases: Inlet Line Size; Upstream Line Size; Inlet Pipe Class; NPS
   similar_values_reference: 1 in; 2 in; 3 in; 4 in; 6 in; 8 in; 12 in; STD; XS; SCH 40; SCH 80
   output_spec:
-    sv2_spec_row: Row 4
     sv2_spec_field_name: Inlet Pipe Size/Sch
-  notes: Line size also embedded in Row 3 Line Number tag (e.g. '3"-CL-1803...' → 3 in). Use Row 11 as
-    primary source.
+  notes: Line size also embedded in the Line Number tag (e.g. '3"-CL-1803...' → 3 in). Use the Line Size and Schedule field as primary source.
 - id: 6
   sv2_field_name: Outlet Pipe Size/Sch
   extraction_type: direct
   requirement: mandatory
   unit: in / Schedule
   source:
-    enquiry_field_name: Line Size and Schedule — Outlet (Row 11)
+    enquiry_field_name: Line Size and Schedule — Outlet
     example_value: 3 in STD | 12 in XS | 6 in STD
   logic: Extract outlet size and schedule from the Line Size and Schedule (Outlet) field. Usually same as inlet unless expander is fitted.
   example_output: 3 in/STD | 12 in/XS | 6 in/STD
@@ -115,7 +108,6 @@ document_extraction_fields:
   aliases: Outlet Line Size; Downstream Pipe Size
   similar_values_reference: Same as inlet in most cases
   output_spec:
-    sv2_spec_row: Row 5
     sv2_spec_field_name: Outlet Pipe Size/Sch
   notes: If Outlet size differs from Inlet size, an expander/reducer is required. Flag for engineer review.
 - id: 7
@@ -124,7 +116,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²-g
   source:
-    enquiry_field_name: Design Pressure / Temperature (Row 27)
+    enquiry_field_name: Design Pressure / Temperature
     example_value: 12 kgf/cm²-g | 8 kgf/cm²-g | 10 kgf/cm²-g
   logic: Extract maximum design pressure from the Design Pressure / Temperature field of the Enquiry DS. This is the higher of the two values stated.
   example_output: 12 kgf/cm²-g | 8 kgf/cm²-g | 10 kgf/cm²-g
@@ -134,7 +126,6 @@ document_extraction_fields:
   aliases: Design Pressure; Max Design Pressure; DP MAX; MAWP
   similar_values_reference: —
   output_spec:
-    sv2_spec_row: Row 6
     sv2_spec_field_name: Design Temp(MAX/MIN)
   notes: Design pressure determines the ASME pressure class (150#, 300#, 600# etc.) per ASME B16.34 P-
     T tables.
@@ -144,7 +135,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²-g
   source:
-    enquiry_field_name: Design Pressure / Temperature (Row 27)
+    enquiry_field_name: Design Pressure / Temperature
     example_value: FV kgf/cm²-g | FV kgf/cm²-g | — (not stated)
   logic: Extract minimum design pressure from the Design Pressure / Temperature field. FV = Full Vacuum = -1.033 kgf/cm²-a (or 0 absolute). Carry as 'FV' text if shown.
   example_output: FV | FV | —
@@ -154,7 +145,6 @@ document_extraction_fields:
   aliases: Min Design Pressure; Full Vacuum; FV; MDMP
   similar_values_reference: FV; Full Vacuum; -1 barg; Vacuum
   output_spec:
-    sv2_spec_row: Row 7
     sv2_spec_field_name: Design Pressure(MAX/MIN)
   notes: FV = Full Vacuum as design condition. See DS Page 2 process notes. Confirm with engineer before
     populating Sv2.
@@ -164,7 +154,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: °C
   source:
-    enquiry_field_name: Design Pressure / Temperature (Row 27)
+    enquiry_field_name: Design Pressure / Temperature
     example_value: 150 °C | 220 °C | 65 °C
   logic: Extract maximum design temperature from the Design Pressure / Temperature field of the Enquiry DS.
   example_output: 150 °C | 220 °C | 65 °C
@@ -174,7 +164,6 @@ document_extraction_fields:
   aliases: Design Temperature; Max Temp; MADT; MDMT (max)
   similar_values_reference: —
   output_spec:
-    sv2_spec_row: Row 7
     sv2_spec_field_name: Design Temp(MAX/MIN)
   notes: Determines material grade selection (e.g. need for low-temp grades below -29°C, or high-temp
     grades above 230°C).
@@ -184,7 +173,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: °C
   source:
-    enquiry_field_name: Ambient Temperature (Row 5) / Process Notes Page 2
+    enquiry_field_name: Ambient Temperature / Process Notes Page 2
     example_value: 4.4 °C (MDMT from process notes all 3 tags)
   logic: MDMT (Minimum Design Metal Temperature) is stated in the DS Page 2 Process Notes. Not the same as ambient temperature. Extract from the notes text.
   example_output: 4.4 °C | 4.4 °C | 4.4 °C
@@ -194,17 +183,15 @@ document_extraction_fields:
   aliases: MDMT; Min Design Metal Temperature; Low Temp; Cold Design Temp
   similar_values_reference: —
   output_spec:
-    sv2_spec_row: Row 7
     sv2_spec_field_name: Design Temp(MAX/MIN)
-  notes: MDMT drives low-temperature material requirements (impact testing). Located in Page 2 Process
-    Notes, not Row 5.
+  notes: MDMT drives low-temperature material requirements (impact testing). Located in the Page 2 Process Notes, not the Ambient Temperature field.
 - id: 11
   sv2_field_name: Flow Rate (MAX)
   extraction_type: direct
   requirement: mandatory
   unit: Am³/h | kg/h | Nm³/h
   source:
-    enquiry_field_name: Flow Rate @ Max Flow (Row 18)
+    enquiry_field_name: Flow Rate @ Max Flow
     example_value: 10.5 | 6405 | 2640
   logic: Extract flow rate value from the '@ Max Flow' column of the Flow Rate field. Preserve units exactly as stated.
   example_output: 10.5 m³/h | 6405 kg/h | 2640 Nm³/h
@@ -214,17 +201,15 @@ document_extraction_fields:
   aliases: Maximum Flow Rate; Flow Max; Qmax; Mass Flow Max
   similar_values_reference: m³/h; Am³/h; Nm³/h; kg/h; kg/s; lb/h
   output_spec:
-    sv2_spec_row: Row 11
     sv2_spec_field_name: Flow rate
-  notes: Units vary between liquid (Am³/h or kg/h) and gas (Nm³/h or kg/h). Check units column in Row
-    17 header row.
+  notes: Units vary between liquid (Am³/h or kg/h) and gas (Nm³/h or kg/h). Check the units column in the flow rate table header.
 - id: 12
   sv2_field_name: Flow Rate (NOR)
   extraction_type: direct
   requirement: mandatory
   unit: Am³/h | kg/h | Nm³/h
   source:
-    enquiry_field_name: Flow Rate @ Norm Flow (Row 18)
+    enquiry_field_name: Flow Rate @ Norm Flow
     example_value: 9.5 | 5823 | 2400
   logic: Extract flow rate value from the '@ Norm. Flow' column of the Flow Rate field.
   example_output: 9.5 m³/h | 5823 kg/h | 2400 Nm³/h
@@ -234,7 +219,6 @@ document_extraction_fields:
   aliases: Normal Flow Rate; Nominal Flow; Design Flow; Qnorm
   similar_values_reference: Same as Max units
   output_spec:
-    sv2_spec_row: Row 11
     sv2_spec_field_name: Flow rate
   notes: Normal (design) flow is the primary sizing case. Cv at Normal flow determines valve % travel
     target.
@@ -244,7 +228,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: Am³/h | kg/h | Nm³/h
   source:
-    enquiry_field_name: Flow Rate @ Min Flow (Row 18)
+    enquiry_field_name: Flow Rate @ Min Flow
     example_value: 4.8 | 2912 | 2920
   logic: Extract flow rate value from the '@ Min. Flow' column of the Flow Rate field.
   example_output: 4.8 m³/h | 2912 kg/h | 2920 Nm³/h
@@ -254,7 +238,6 @@ document_extraction_fields:
   aliases: Minimum Flow Rate; Qmin; Low Flow
   similar_values_reference: Same as Max units
   output_spec:
-    sv2_spec_row: Row 11
     sv2_spec_field_name: Flow rate
   notes: Minimum flow case checks that valve does not throttle too close to closed position (< 10% travel).
 - id: 14
@@ -263,7 +246,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²-g
   source:
-    enquiry_field_name: Inlet Pressure @ Max Flow (Row 19)
+    enquiry_field_name: Inlet Pressure @ Max Flow
     example_value: 6.8 | 3.31 | 4.3
   logic: Extract inlet pressure from the '@ Max Flow' column of the Inlet Pressure field.
   example_output: 6.8 kgf/cm²-g | 3.31 kgf/cm²-g | 4.3 kgf/cm²-g
@@ -273,7 +256,6 @@ document_extraction_fields:
   aliases: P1 Max; Upstream Pressure Max; Inlet P Max
   similar_values_reference: bar-g; kPa-g; psi-g; kgf/cm²-g; kgf/cm²-a
   output_spec:
-    sv2_spec_row: Row 12
     sv2_spec_field_name: Inlet Press.
   notes: Check gauge vs absolute units. Enquiry DS uses kgf/cm²-g (gauge). If absolute ('a'), subtract
     1.033 to convert to gauge.
@@ -283,7 +265,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²-g
   source:
-    enquiry_field_name: Inlet Pressure @ Norm Flow (Row 19)
+    enquiry_field_name: Inlet Pressure @ Norm Flow
     example_value: 6.8 | 3.31 | 4.33
   logic: Extract inlet pressure from the '@ Norm. Flow' column of the Inlet Pressure field.
   example_output: 6.8 kgf/cm²-g | 3.31 kgf/cm²-g | 4.33 kgf/cm²-g
@@ -293,7 +275,6 @@ document_extraction_fields:
   aliases: P1 Norm; Upstream Pressure Normal; Inlet P Normal
   similar_values_reference: Same as Max
   output_spec:
-    sv2_spec_row: Row 12
     sv2_spec_field_name: Inlet Press.
 - id: 16
   sv2_field_name: Inlet Pressure (MIN)
@@ -301,7 +282,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²-g
   source:
-    enquiry_field_name: Inlet Pressure @ Min Flow (Row 19)
+    enquiry_field_name: Inlet Pressure @ Min Flow
     example_value: 6.9 | 3.32 | 4.4
   logic: Extract inlet pressure from the '@ Min. Flow' column of the Inlet Pressure field.
   example_output: 6.9 kgf/cm²-g | 3.32 kgf/cm²-g | 4.4 kgf/cm²-g
@@ -311,7 +292,6 @@ document_extraction_fields:
   aliases: P1 Min; Upstream Pressure Min
   similar_values_reference: Same as Max
   output_spec:
-    sv2_spec_row: Row 12
     sv2_spec_field_name: Inlet Press.
 - id: 17
   sv2_field_name: Outlet Pressure (MAX)
@@ -319,7 +299,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²-g
   source:
-    enquiry_field_name: Not directly stated — derived from Rows 19 & 20
+    enquiry_field_name: Not directly stated — derived from Inlet Pressure and Pressure Drop
     example_value: 'Calculated: 6.8 - 6.57 = 0.23 | 3.31 - 0.3 = 3.01 | 4.3 - 1.72 = 2.58'
   logic: Outlet Pressure = Inlet Pressure − Pressure Drop for each case. Sv2 requires explicit outlet pressure.
   example_output: 0.23 kgf/cm²-g | 3.01 kgf/cm²-g | 2.58 kgf/cm²-g
@@ -329,7 +309,6 @@ document_extraction_fields:
   aliases: P2 Max; Downstream Pressure Max; Back Pressure Max
   similar_values_reference: —
   output_spec:
-    sv2_spec_row: Row 13
     sv2_spec_field_name: Outlet Press.
   notes: If result is negative, check whether Enquiry DS uses absolute rather than gauge pressure. Flag
     for engineer confirmation.
@@ -339,7 +318,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²-g
   source:
-    enquiry_field_name: Not directly stated — derived from Rows 19 & 20
+    enquiry_field_name: Not directly stated — derived from Inlet Pressure and Pressure Drop
     example_value: 'Calculated: 6.8 - 6.6 = 0.20 | 3.31 - 0.31 = 3.00 | 4.33 - 1.74 = 2.59'
   logic: Outlet Pressure NOR = Inlet Pressure NOR − Pressure Drop NOR.
   example_output: 0.20 kgf/cm²-g | 3.00 kgf/cm²-g | 2.59 kgf/cm²-g
@@ -349,7 +328,6 @@ document_extraction_fields:
   aliases: P2 Norm; Downstream Pressure Normal
   similar_values_reference: —
   output_spec:
-    sv2_spec_row: Row 13
     sv2_spec_field_name: Outlet Press.
 - id: 19
   sv2_field_name: Outlet Pressure (MIN)
@@ -357,7 +335,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²-g
   source:
-    enquiry_field_name: Not directly stated — derived from Rows 19 & 20
+    enquiry_field_name: Not directly stated — derived from Inlet Pressure and Pressure Drop
     example_value: 'Calculated: 6.9 - 6.7 = 0.20 | 3.32 - 0.32 = 3.00 | 4.4 - 1.83 = 2.57'
   logic: Outlet Pressure MIN = Inlet Pressure MIN − Pressure Drop MIN.
   example_output: 0.20 kgf/cm²-g | 3.00 kgf/cm²-g | 2.57 kgf/cm²-g
@@ -367,7 +345,6 @@ document_extraction_fields:
   aliases: P2 Min; Downstream Pressure Min
   similar_values_reference: —
   output_spec:
-    sv2_spec_row: Row 13
     sv2_spec_field_name: Outlet Press.
 - id: 20
   sv2_field_name: Pressure Drop (MAX)
@@ -375,7 +352,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²
   source:
-    enquiry_field_name: Pressure Drop @ Max Flow (Row 20)
+    enquiry_field_name: Pressure Drop @ Max Flow
     example_value: 6.57 | 0.3 | 1.72
   logic: Extract pressure drop from the '@ Max Flow' column of the Pressure Drop field.
   example_output: 6.57 kgf/cm² | 0.3 kgf/cm² | 1.72 kgf/cm²
@@ -385,7 +362,6 @@ document_extraction_fields:
   aliases: dP Max; Delta P Max; Differential Pressure Max; ΔP
   similar_values_reference: bar; kPa; psi; kgf/cm²
   output_spec:
-    sv2_spec_row: Row 14
     sv2_spec_field_name: Pressure drop
   notes: Pressure drop at max flow gives the largest Cv but may not be the most critical case for control.
 - id: 21
@@ -394,7 +370,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²
   source:
-    enquiry_field_name: Pressure Drop @ Norm Flow (Row 20)
+    enquiry_field_name: Pressure Drop @ Norm Flow
     example_value: 6.6 | 0.31 | 1.74
   logic: Extract pressure drop from the '@ Norm. Flow' column of the Pressure Drop field.
   example_output: 6.6 kgf/cm² | 0.31 kgf/cm² | 1.74 kgf/cm²
@@ -404,7 +380,6 @@ document_extraction_fields:
   aliases: dP Norm; Delta P Normal
   similar_values_reference: Same as Max
   output_spec:
-    sv2_spec_row: Row 14
     sv2_spec_field_name: Pressure drop
 - id: 22
   sv2_field_name: Pressure Drop (MIN)
@@ -412,7 +387,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²
   source:
-    enquiry_field_name: Pressure Drop @ Min Flow (Row 20)
+    enquiry_field_name: Pressure Drop @ Min Flow
     example_value: 6.7 | 0.32 | 1.83
   logic: Extract pressure drop from the '@ Min. Flow' column of the Pressure Drop field.
   example_output: 6.7 kgf/cm² | 0.32 kgf/cm² | 1.83 kgf/cm²
@@ -422,7 +397,6 @@ document_extraction_fields:
   aliases: dP Min; Delta P Min
   similar_values_reference: Same as Max
   output_spec:
-    sv2_spec_row: Row 14
     sv2_spec_field_name: Pressure drop
 - id: 23
   sv2_field_name: Temperature (MAX)
@@ -430,7 +404,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: °C
   source:
-    enquiry_field_name: Inlet Temperature @ Max Flow (Row 21)
+    enquiry_field_name: Inlet Temperature @ Max Flow
     example_value: 99.9 | 160 | 40
   logic: Extract temperature from the '@ Max Flow' column of the Inlet Temperature field.
   example_output: 99.9 °C | 160 °C | 40 °C
@@ -440,7 +414,6 @@ document_extraction_fields:
   aliases: T Max; Process Temperature Max; Fluid Temp Max
   similar_values_reference: °C; °F; K
   output_spec:
-    sv2_spec_row: Row 15
     sv2_spec_field_name: Temperature
   notes: High temperature affects packing selection, bonnet type, and body material grade.
 - id: 24
@@ -449,7 +422,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: °C
   source:
-    enquiry_field_name: Inlet Temperature @ Norm Flow (Row 21)
+    enquiry_field_name: Inlet Temperature @ Norm Flow
     example_value: 99.9 | 160 | 40
   logic: Extract temperature from the '@ Norm. Flow' column of the Inlet Temperature field.
   example_output: 99.9 °C | 160 °C | 40 °C
@@ -459,7 +432,6 @@ document_extraction_fields:
   aliases: T Norm; Process Temperature Normal
   similar_values_reference: Same as Max
   output_spec:
-    sv2_spec_row: Row 15
     sv2_spec_field_name: Temperature
 - id: 25
   sv2_field_name: Temperature (MIN)
@@ -467,7 +439,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: °C
   source:
-    enquiry_field_name: Inlet Temperature @ Min Flow (Row 21)
+    enquiry_field_name: Inlet Temperature @ Min Flow
     example_value: 99.99 | 160 | 40
   logic: Extract temperature from the '@ Min. Flow' column of the Inlet Temperature field.
   example_output: 99.99 °C | 160 °C | 40 °C
@@ -477,7 +449,6 @@ document_extraction_fields:
   aliases: T Min; Process Temperature Min
   similar_values_reference: Same as Max
   output_spec:
-    sv2_spec_row: Row 15
     sv2_spec_field_name: Temperature
 - id: 26
   sv2_field_name: Specific Gravity / Molecular Weight
@@ -485,7 +456,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: kg/m³ or dimensionl ess or g/mol
   source:
-    enquiry_field_name: Inlet Density / Specific Gravity / Molecular Mass (Row 22)
+    enquiry_field_name: Inlet Density / Specific Gravity / Molecular Mass
     example_value: 955 kg/m³ (SG=0.955) | — (steam) | 28.96 (MW)
   logic: 'Liquid service: the density field gives density in kg/m3 → divide by 1000 to get SG (e.g. 955/1000 = 0.955). Gas service: the field gives MW in g/mol (e.g. 28.96 for air). Steam service: leave blank; Sv2 uses steam tables.'
   example_output: SG = 0.955 | Blank (steam) | MW = 28.96 g/mol
@@ -495,17 +466,15 @@ document_extraction_fields:
   aliases: Spec. Gravity; SG; Specific Gravity; Molecular Weight; MW; Density; Relative Density
   similar_values_reference: kg/m³; kg/L; g/cm³; dimensionless SG; g/mol
   output_spec:
-    sv2_spec_row: Row 17
     sv2_spec_field_name: Spec. Gravity
-  notes: Units must be verified. If Row 22 header says 'kg/m³' for a liquid, divide by 1000 for SG. If
-    already dimensionless, use directly.
+  notes: Units must be verified. If the density field header says 'kg/m³' for a liquid, divide by 1000 for SG. If already dimensionless, use directly.
 - id: 27
   sv2_field_name: Viscosity
   extraction_type: direct
   requirement: mandatory
   unit: cP
   source:
-    enquiry_field_name: Inlet Viscosity (Row 24)
+    enquiry_field_name: Inlet Viscosity
     example_value: 0.276 | 0.014 | 0.0191
   logic: Copy viscosity value from the Viscosity field of the Enquiry DS.
   example_output: 0.276 cP | 0.014 cP | 0.0191 cP
@@ -515,7 +484,6 @@ document_extraction_fields:
   aliases: Viscosity; Dynamic Viscosity; Kinematic Viscosity; μ; Centipoise
   similar_values_reference: 'cP; mPa·s; cSt (note: cSt ≠ cP for density ≠ 1)'
   output_spec:
-    sv2_spec_row: Row 18
     sv2_spec_field_name: Viscosity
   notes: 'Viscosity affects Fp correction factor for high- viscosity liquids. If in cSt, convert: cP =
     cSt × SG.'
@@ -525,7 +493,7 @@ document_extraction_fields:
   requirement: conditional
   unit: Dimensionl ess
   source:
-    enquiry_field_name: Inlet Compressibility Factor (Row 23)
+    enquiry_field_name: Inlet Compressibility Factor
     example_value: — (liquid; not applicable) | — (steam) | 0.999
   logic: Extract Z from the Compressibility Factor field. Applicable for gas/vapour only. Leave blank for liquid and steam (Sv2 applies steam tables).
   example_output: N/A (liquid) | N/A (steam) | 0.999
@@ -535,16 +503,15 @@ document_extraction_fields:
   aliases: Z Factor; Gas Compressibility; Compressibility; Z
   similar_values_reference: 0.95 to 1.05 typical range
   output_spec:
-    sv2_spec_row: Row 16
     sv2_spec_field_name: Z
-  notes: For ideal gases Z = 1.0. If Row 23 is blank for a gas service, use Z = 1.0 as default.
+  notes: For ideal gases Z = 1.0. If the Compressibility Factor field is blank for a gas service, use Z = 1.0 as default.
 - id: 29
   sv2_field_name: Specific Heats Ratio (K)
   extraction_type: direct
   requirement: conditional
   unit: Dimensionl ess
   source:
-    enquiry_field_name: Inlet Specific Heats Ratio (Row 25)
+    enquiry_field_name: Inlet Specific Heats Ratio
     example_value: — (liquid; not applicable) | 1.317 (steam) | 1.4 (air)
   logic: Extract K from the Specific Heats Ratio field. Applicable for gas and steam only. Leave blank for liquid services.
   example_output: N/A (liquid) | 1.317 | 1.4
@@ -554,7 +521,6 @@ document_extraction_fields:
   aliases: Isentropic Exponent; Cp/Cv; Gamma; K; Specific Heat Ratio
   similar_values_reference: Air = 1.4; Steam ≈ 1.3; Nitrogen = 1.4; CO2 = 1.3
   output_spec:
-    sv2_spec_row: Row 18
     sv2_spec_field_name: K
   notes: K affects the choked flow (critical pressure drop ratio) calculation. If not stated for a gas
     service, use 1.4 as conservative default for diatomic gases.
@@ -564,7 +530,7 @@ document_extraction_fields:
   requirement: conditional
   unit: kgf/cm²-a
   source:
-    enquiry_field_name: Inlet Vapour Pressure (Row 26)
+    enquiry_field_name: Inlet Vapour Pressure
     example_value: 1.031 kgf/cm²-a | — (steam; not applicable) | — (gas; not applicable)
   logic: Extract vapour pressure from the Vapour Pressure field. Applicable for liquid services only. Used to check cavitation and flashing.
   example_output: 1.031 kgf/cm²-a | N/A | N/A
@@ -574,7 +540,6 @@ document_extraction_fields:
   aliases: Pv; Vapour Pressure; Psat; Liquid Vapour Pressure
   similar_values_reference: kgf/cm²-a; bar-a; psia; kPa-a
   output_spec:
-    sv2_spec_row: Row 16
     sv2_spec_field_name: Vapour Press.
   notes: Must be in absolute pressure units. If given as gauge, add 1.033 kgf/cm² to convert to absolute.
 - id: 31
@@ -583,7 +548,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Body Type (Row 32)
+    enquiry_field_name: Body Type
     example_value: Single Seat Globe | Single Seat Globe | Single Seat Globe
   logic: Copy body type from the Body Type field of the Enquiry DS verbatim.
   example_output: Single Seat Globe | Single Seat Globe | Single Seat Globe
@@ -593,7 +558,6 @@ document_extraction_fields:
   aliases: Body Type; Valve Type; Valve Body Style; Body Style
   similar_values_reference: Single Seated Globe; Double Seated Globe; Butterfly; Ball; Angle; Y-Pattern
   output_spec:
-    sv2_spec_row: Row 27
     sv2_spec_field_name: Type
   notes: Valve type is always stated by the customer in this format. Do not leave for engineer to determine.
 - id: 32
@@ -602,7 +566,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Body Material (Row 36)
+    enquiry_field_name: Body Material
     example_value: F.S. ASTM A105 Normalized | C.S. ASTM A216 WCB | C.S. ASTM A216 WCB
   logic: Copy body material specification verbatim from the Body Material field of the Enquiry DS. This is fully stated by the customer.
   example_output: F.S. ASTM A105 Normalized | ASTM A216 Gr. WCC | ASTM A216 Gr. WCC
@@ -612,7 +576,6 @@ document_extraction_fields:
   aliases: Body Material; Body MOC; Body Grade; Pressure Boundary Material
   similar_values_reference: A105; A216 WCB; A216 WCC; A351 CF8M; A351 CF3M; A182 F316
   output_spec:
-    sv2_spec_row: Row 29
     sv2_spec_field_name: Body Material
   notes: 'Note: Enquiry DS says ''A216 WCB'' while KSB MIL DS shows ''A216 Gr. WCC'' — verify with engineer.
     WCB and WCC are different grades. Do not silently change.'
@@ -622,7 +585,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Bonnet Type / Material (Row 37)
+    enquiry_field_name: Bonnet Type / Material
     example_value: Bolted Flange A105 | Bolted Flange A216 WCB | Bolted Flange A216 WCB
   logic: Copy bonnet type and material from the Bonnet Type / Material field of the Enquiry DS.
   example_output: Bolted Flange A105 | Bolted Flange A216 WCB | Bolted Flange A216 WCB
@@ -632,17 +595,15 @@ document_extraction_fields:
   aliases: Bonnet Type; Bonnet; Bonnet Style; Bonnet Material
   similar_values_reference: Standard; Extended; Finned Extension; Cryogenic; Bolted Flange; Pressure Seal
   output_spec:
-    sv2_spec_row: Row 35
     sv2_spec_field_name: Bonnet Type
-  notes: Extended or finned bonnet required for steam above 200°C or cryogenic services. Check pipe insulation
-    (Row 13) for guidance.
+  notes: Extended or finned bonnet required for steam above 200°C or cryogenic services. Check the pipe insulation field for guidance.
 - id: 34
   sv2_field_name: Flow Direction
   extraction_type: direct
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Flow Direction (Row 38)
+    enquiry_field_name: Flow Direction
     example_value: FTC (Flow-To-Close) | FTO (Flow-To-Open) | FTO (Flow-To-Open)
   logic: Copy flow direction from the Flow Direction field of the Enquiry DS. FTC = Flow-To-Close; FTO = Flow-To-Open.
   example_output: Flow to close | Flow to open | Flow to open
@@ -652,7 +613,6 @@ document_extraction_fields:
   aliases: Flow Direction; FTC; FTO; Flow-To- Close; Flow-To-Open; Flow Under Seat
   similar_values_reference: FTC; FTO; Over the seat; Under the seat
   output_spec:
-    sv2_spec_row: Row 31
     sv2_spec_field_name: Flow Direction
   notes: Flow direction affects actuator unbalance forces and determines stability. Customer-specified;
     do not change.
@@ -662,7 +622,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: End Connec. & Rating (Row 35)
+    enquiry_field_name: End Connec. & Rating
     example_value: 1.5" 300# RF | 8" 300# RF | 4" 300# RF
   logic: Copy end connection type, size, and rating from the End Connec. & Rating field of the Enquiry DS.
   example_output: Flanged-ASME 300 RF | Flanged-ASME 300 RF | Flanged-ASME 300 RF
@@ -672,17 +632,15 @@ document_extraction_fields:
   aliases: End Connection; Flange Rating; ANSI Class; Flange Type; Body Rating
   similar_values_reference: ASME 150 RF; ASME 300 RF; ASME 600 RF; ASME 900 RTJ; Butt Weld
   output_spec:
-    sv2_spec_row: Rows 30/32/33
     sv2_spec_field_name: End Conn. (Inlet/Outlet)
-  notes: Body size shown in Row 33 ('By Vendor') means KSB MIL selects from catalogue after Cv calculation.
-    Rating determines the body design pressure.
+  notes: Body size shown as 'By Vendor' means KSB MIL selects from catalogue after Cv calculation. Rating determines the body design pressure.
 - id: 36
   sv2_field_name: Flow Characteristic
   extraction_type: derived
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Characteristic (Rated Cv / Characteristic Row 34)
+    enquiry_field_name: Characteristic (Rated Cv / Characteristic)
     example_value: Linear | Equal% | Linear
   logic: 'When the Characteristic field shows ''By Vendor'', engineer selects based on process control requirements: Equal Percentage for pressure-drop ratio > 0.3; Linear for most other cases. Otherwise copy the stated characteristic.'
   example_output: Linear | Equal % | Linear
@@ -692,7 +650,6 @@ document_extraction_fields:
   aliases: Characteristic; Flow Characteristic; Inherent Characteristic; Cv Characteristic
   similar_values_reference: Linear; Equal Percentage; Quick Opening; Modified Parabolic
   output_spec:
-    sv2_spec_row: Row 40
     sv2_spec_field_name: Characteristic
   notes: Equal Percentage selected when the valve pressure drop varies significantly across the flow range.
     Linear when pressure drop is relatively constant.
@@ -702,7 +659,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Trim Type (Row 42)
+    enquiry_field_name: Trim Type
     example_value: Low Noise Trim | Contoured Trim | Low Noise Trim
   logic: Copy trim type from the Trim Type field of the Enquiry DS verbatim.
   example_output: Low Noise Trim (Anti-Cavitation) | Contoured Trim | Low Noise Trim
@@ -712,7 +669,6 @@ document_extraction_fields:
   aliases: Trim Type; Plug Type; Trim Style; Plug Style; Cage Type
   similar_values_reference: Standard Contoured; Low Noise; Anti-Cavitation; Parabolic; V-Port; Characterized
   output_spec:
-    sv2_spec_row: Row 42
     sv2_spec_field_name: Plug Type
   notes: Low Noise trim is specified because SPL at max flow approaches or exceeds allowable. Verify SPL
     result after Cv calculation.
@@ -722,7 +678,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Plug / Ball / Disk Material (Row 44)
+    enquiry_field_name: Plug / Ball / Disk Material
     example_value: 410 (13Cr) | 410 (13Cr) | 410 (13Cr)
   logic: Copy plug material from the Plug / Ball / Disk Material field of the Enquiry DS verbatim.
   example_output: SS 410 + Stellite No.6 | SS 410 + Stellite No.6 | SS 410 + Stellite No.6
@@ -732,7 +688,6 @@ document_extraction_fields:
   aliases: Plug Material; Ball Material; Disk Material; Trim Material; Plug MOC
   similar_values_reference: SS 316; SS 410; 17-4PH; Stellite overlay; Hastelloy C
   output_spec:
-    sv2_spec_row: Row 46
     sv2_spec_field_name: Plug Material
   notes: Enquiry DS states '410 (13Cr)'; KSB MIL DS output shows 'SS 410 + Stellite No.6' — the Stellite
     hard-facing is a KSB MIL standard addition for corrosion and erosion resistance.
@@ -742,7 +697,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Seat Material (Row 45)
+    enquiry_field_name: Seat Material
     example_value: St Gr6 (CoCrAlloy) | St Gr6 (CoCrAlloy) | St Gr6 (CoCrAlloy)
   logic: Copy seat material from the Seat Material field of the Enquiry DS verbatim.
   example_output: SS 410 + Stellite No.6 | SS 410 + Stellite No.6 | SS 410 + Stellite No.6
@@ -752,7 +707,6 @@ document_extraction_fields:
   aliases: Seat Material; Seat Ring Material; Seat MOC
   similar_values_reference: SS 316; SS 410; Stellite; Monel; Inconel
   output_spec:
-    sv2_spec_row: Row 47
     sv2_spec_field_name: Seat Material
   notes: '''St Gr6'' = Stellite Grade 6 (Cobalt-Chromium alloy). KSB MIL DS shows seat as SS 410 + Stellite
     overlay. Confirm mapping with engineer.'
@@ -762,7 +716,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Tightness Requirements (Row 7)
+    enquiry_field_name: Tightness Requirements
     example_value: ANSI IV (standard) | ANSI IV (standard) | ANSI V
   logic: 'Map customer tightness requirement to FCI 70.2 leakage class: ANSI IV → IV (FCI 70.2); ANSI
     V → V (FCI 70.2); ANSI VI → VI (FCI 70.2)'
@@ -773,7 +727,6 @@ document_extraction_fields:
   aliases: Leakage Class; Seat Leakage; Tightness Class; Shut-off Class
   similar_values_reference: Class I; Class II; Class III; Class IV; Class V; Class VI; Zero Leakage
   output_spec:
-    sv2_spec_row: Row 41
     sv2_spec_field_name: Seat Leakage Class
   notes: Class V required for Tag 3 (ANSI V). Class V requires lapped metal seat. Increases cost and lead
     time. Flag for review.
@@ -783,7 +736,7 @@ document_extraction_fields:
   requirement: optional
   unit: —
   source:
-    enquiry_field_name: Guiding / No. of Ports (Row 41)
+    enquiry_field_name: Guiding / No. of Ports
     example_value: By Vendor / 1 (all tags)
   logic: '''By Vendor'' means KSB MIL selects guiding arrangement. Standard for single-seated globe: Heavy
     Top Guiding for Tag 1 and 3; Cage Guiding for Tag 2 (heavy-duty steam).'
@@ -794,7 +747,6 @@ document_extraction_fields:
   aliases: Guiding; Guide Type; Plug Guiding; Top-and-Bottom Guiding
   similar_values_reference: Top Guided; Cage Guided; Top- and-Bottom Guided; Port Guided
   output_spec:
-    sv2_spec_row: Row 45
     sv2_spec_field_name: Guiding
   notes: Guiding selection affects valve stability at high pressure drops. KSB MIL selects based on valve
     series and dP ratio.
@@ -804,7 +756,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Type (Actuator) (Row 50)
+    enquiry_field_name: Type (Actuator)
     example_value: Spring Diaphragm | Spring Diaphragm | Spring Diaphragm
   logic: Copy actuator type from the Type (Actuator) field of the Enquiry DS.
   example_output: Pneumatic Spring Diaphragm | Pneumatic Spring Diaphragm | Pneumatic Spring Diaphragm
@@ -814,7 +766,6 @@ document_extraction_fields:
   aliases: Actuator Type; Actuator Style; Pneumatic Actuator; Diaphragm Actuator
   similar_values_reference: Spring Diaphragm; Piston; Scotch- Yoke; Electric; Electro-Hydraulic
   output_spec:
-    sv2_spec_row: Row 51
     sv2_spec_field_name: Type
   notes: All three tags use Spring Diaphragm type — the most common pneumatic actuator. Piston actuator
     used for high shut-off or large bore valves.
@@ -824,7 +775,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Power Failure Position (Row 9) + Air Failure Valve (Row 52)
+    enquiry_field_name: Power Failure Position + Air Failure Valve
     example_value: Open (R9) / Open (R52) | Close (R9) / Close (R52) | Open (R9) / Open (R52)
   logic: 'The Power Failure Position field gives the safe position on air loss. Map: Fail Open → Air to Close (ATC); Fail Close → Air to Open (ATO). Cross-check against the Air Failure Valve field for confirmation.'
   example_output: Air to Close (ATC) | Air to Open (ATO) | Air to Close (ATC)
@@ -834,17 +785,15 @@ document_extraction_fields:
   aliases: Fail Position; Fail Safe; Air Failure; FO; FC; Air to Close; Air to Open; ATC; ATO
   similar_values_reference: FO (Fail Open); FC (Fail Close); FL (Fail Last); Air to Close; Air to Open
   output_spec:
-    sv2_spec_row: Rows 53/54
     sv2_spec_field_name: Action / Air Failure
-  notes: 'Actuator colour coding follows: ATC (Fail Open) → GREEN actuator; ATO (Fail Close) → RED actuator.
-    See KSB MIL DS Sheet 2 Row 112.'
+  notes: 'Actuator colour coding follows: ATC (Fail Open) → GREEN actuator; ATO (Fail Close) → RED actuator. See KSB MIL DS Sheet 2 (Actuator Colour section).'
 - id: 44
   sv2_field_name: Supply Pressure
   extraction_type: derived
   requirement: mandatory
   unit: kgf/cm²
   source:
-    enquiry_field_name: Available Air Supply Pressure (Row 8)
+    enquiry_field_name: Available Air Supply Pressure
     example_value: Min 3.5 kgf/cm² / Max 7 kgf/cm² (all tags)
   logic: 'Use the minimum available supply pressure from the Available Air Supply Pressure field. Convert to psi: × 14.223. Round to nearest standard value. 3.5 kgf/cm² × 14.223 ≈ 50 psi.'
   example_output: 50 psi (all tags)
@@ -854,7 +803,6 @@ document_extraction_fields:
   aliases: Air Supply; Instrument Air; IA Supply; Air Supply Pressure; Pneumatic Supply
   similar_values_reference: 35 psi; 50 psi; 60 psi; 80 psi
   output_spec:
-    sv2_spec_row: Row 56
     sv2_spec_field_name: Supply Press.
   notes: Use minimum supply to ensure actuator can stroke even at lowest supply condition. Bench range
     must be set below supply pressure minus positioner overhead (~5 psi).
@@ -864,7 +812,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: psi
   source:
-    enquiry_field_name: Bench Range (Row 54)
+    enquiry_field_name: Bench Range
     example_value: By Vendor | By Vendor | By Vendor
   logic: '''By Vendor'' on all three tags → KSB MIL calculates bench range from actuator sizing (spring
     rate × travel + preload). Typical values: 3-15 psi, 6-30 psi. KSB MIL DS shows 3-15 psi (Tag1) and
@@ -876,7 +824,6 @@ document_extraction_fields:
   aliases: Bench Range; Spring Range; Spring Calibration; Air Range; Bench Set
   similar_values_reference: 3-15 psi; 6-30 psi; 3-27 psi; 6-18 psi
   output_spec:
-    sv2_spec_row: Row 55
     sv2_spec_field_name: Bench Range
   notes: Bench range calculated by actuator sizing to ensure adequate shut-off thrust. Cannot be determined
     from Enquiry DS alone — leave for engineer.
@@ -886,8 +833,8 @@ document_extraction_fields:
   requirement: mandatory
   unit: kgf/cm²
   source:
-    enquiry_field_name: Actuator Design Pressure (Row 10)
-    example_value: Not stated in Enquiry DS — derived from Row 27 Design Pressure
+    enquiry_field_name: Actuator Design Pressure
+    example_value: Not stated in Enquiry DS — derived from Design Pressure (MAX)
   logic: Shut-off pressure = maximum design pressure of the valve (Design Pressure MAX).
   example_output: 12 kgf/cm² (Tag1) | 8 kgf/cm² (Tag2) | 10 kgf/cm² (Tag3)
   dependencies:
@@ -896,7 +843,6 @@ document_extraction_fields:
   aliases: Shut-off Pressure; Actuator Rating; MAOP; Max Operating Pressure; Differential Shut-off Pressure
   similar_values_reference: —
   output_spec:
-    sv2_spec_row: Row 57
     sv2_spec_field_name: Shut off Press.
   notes: Used to size actuator spring and diaphragm area to ensure valve closes tightly against max design
     pressure.
@@ -906,7 +852,7 @@ document_extraction_fields:
   requirement: optional
   unit: —
   source:
-    enquiry_field_name: Handwheel (Row 53)
+    enquiry_field_name: Handwheel
     example_value: — (dash; not specified) | — (dash) | Side Mounted
   logic: Copy handwheel requirement from the Handwheel field. '-' or blank = No handwheel. 'Side Mounted' = side-mounted handwheel assembly.
   example_output: No/NA | No/NA | Yes/6A2 (Side Mounted)
@@ -916,7 +862,6 @@ document_extraction_fields:
   aliases: Handwheel; Manual Override; Manual Operator; Side Handwheel; Top Handwheel
   similar_values_reference: No; NA; Side Mounted; Top Mounted; Integral
   output_spec:
-    sv2_spec_row: Row 58
     sv2_spec_field_name: Hand Wheel/Model
   notes: Tag 3 (Plant Air) requires side-mounted handwheel. This is a manual override device — allows
     operator to position valve when air supply is unavailable.
@@ -926,7 +871,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Not stated in Enquiry DS (Row 56 = VTA/VTA)
+    enquiry_field_name: Not stated in Enquiry DS (shown as VTA/VTA)
     example_value: VTA / VTA (all tags)
   logic: 'VTA = Vendor To Advise. KSB MIL selects standard smart positioner: Smart Single Acting (HART).
     Selection standard for all modulating control valves.'
@@ -937,7 +882,6 @@ document_extraction_fields:
   aliases: Positioner Type; Positioner Style; Electro-Pneumatic Positioner
   similar_values_reference: Single Acting; Double Acting; Smart; Conventional; Digital
   output_spec:
-    sv2_spec_row: Row 72
     sv2_spec_field_name: Type
   notes: Smart positioner integrates position transmitter — eliminates need for separate position transmitter
     hardware.
@@ -947,7 +891,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Positioner MFR (Row 56)
+    enquiry_field_name: Positioner MFR
     example_value: VTA (all tags)
   logic: 'VTA → KSB MIL standard selection: METSO. If customer specifies a make (not VTA), copy directly.'
   example_output: METSO
@@ -957,7 +901,6 @@ document_extraction_fields:
   aliases: Positioner Manufacturer; Positioner Make; Brand
   similar_values_reference: METSO; SAMSON; FISHER; ABB; SIEMENS; ROTORK
   output_spec:
-    sv2_spec_row: Row 73
     sv2_spec_field_name: Make
   notes: 'METSO ND9103 is the KSB MIL standard positioner. Alternative approved make: SAMSON 3730.'
 - id: 50
@@ -966,7 +909,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Positioner Model (Row 56)
+    enquiry_field_name: Positioner Model
     example_value: VTA (all tags)
   logic: 'VTA → KSB MIL standard model: ND9103-HX-T (HART communication, aluminium housing, ATEX certified).'
   example_output: ND9103-HX-T
@@ -976,7 +919,6 @@ document_extraction_fields:
   aliases: Positioner Model; Model Number
   similar_values_reference: ND9103-HX-T; TZID-C; 3731-3; DVC6200
   output_spec:
-    sv2_spec_row: Row 74
     sv2_spec_field_name: Model
   notes: 'ND9103-HX-T: HX = HART with XP rating; T = with position transmitter integrated.'
 - id: 51
@@ -985,7 +927,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Signal Inlet (Row 57)
+    enquiry_field_name: Signal Inlet
     example_value: 4-20mA+HART / 3-15Psi (all tags)
   logic: 'Signal ''4-20mA+HART'' → Protocol = HART. Standard casing = Aluminium (IP66). Combined field:
     HART/Aluminium.'
@@ -996,7 +938,6 @@ document_extraction_fields:
   aliases: Communication Protocol; Positioner Protocol; Housing Material; Casing
   similar_values_reference: HART; FOUNDATION Fieldbus; PROFIBUS PA; 4-20mA only
   output_spec:
-    sv2_spec_row: Row 75
     sv2_spec_field_name: Protocol / casing
 - id: 52
   sv2_field_name: Positioner Action / Input Signal
@@ -1004,7 +945,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: mA
   source:
-    enquiry_field_name: Signal Inlet (Row 57) + Increase Signal Valve (Row 58)
+    enquiry_field_name: Signal Inlet + Increase Signal Valve
     example_value: 4-20mA+HART, Increase Signal = Close (Tags 1&3) / Open (Tag 2)
   logic: 'Combine action sense and signal: ''Increase Signal → Close'' = Direct Acting. ''Increase Signal
     → Open'' = Reverse Acting. All tags use 4-20 mA input. Result: ''Direct/4-20 mA'' for ATC valves.'
@@ -1015,7 +956,6 @@ document_extraction_fields:
   aliases: Action; Input Signal; Positioner Action; Direct Acting; Reverse Acting
   similar_values_reference: Direct/4-20mA; Reverse/4-20mA; Direct/3-15psi; Split-range
   output_spec:
-    sv2_spec_row: Row 76
     sv2_spec_field_name: Action/Input Signal
   notes: '''Increase Signal → Close'' means as signal increases, valve closes. This is Direct Acting positioner
     (increasing air closes valve = ATC). For ATO valves, Increase Signal → Open is'
@@ -1025,7 +965,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Area Classification (Row 4)
+    enquiry_field_name: Area Classification
     example_value: Zone 1 Gr. IIC T3 (all tags)
   logic: 'Zone 1 IIC T3 → Intrinsic Safety certification required: ''Intrinsic Safe Ex ia IIC, T6, with
     Weather Proof IP 66 Enclosure'''
@@ -1036,7 +976,6 @@ document_extraction_fields:
   aliases: ATEX Certification; Hazardous Area Certificate; Ex Certification; IS Certificate
   similar_values_reference: Ex ia; Ex d; EEx e; Ex n; PESO Certificate
   output_spec:
-    sv2_spec_row: Row 77
     sv2_spec_field_name: Certification
   notes: typical. Zone 1 requires Intrinsic Safety (Ex ia) or Flameproof (Ex d) certification. KSB MIL
     standard uses Ex ia for positioner. PESO certificate also required (see quality requirements).
@@ -1046,7 +985,7 @@ document_extraction_fields:
   requirement: conditional
   unit: —
   source:
-    enquiry_field_name: Position Transmitter (Row 61)
+    enquiry_field_name: Position Transmitter
     example_value: Yes. 4-20mA+Hart (all tags)
   logic: '''Yes'' → Position transmitter is integral to the smart positioner (METSO ND9103). No separate device. Mounting: Integral to Smart Positioner. Output: 24 VDC / 4-20 mA.'
   example_output: Integral to Smart Positioner / 24 VDC / 4- 20mA
@@ -1056,17 +995,15 @@ document_extraction_fields:
   aliases: Position Transmitter; Stem Position Transmitter; Position Feedback; LVDT
   similar_values_reference: Integral; Separate; Remote Mount; LVDT; Hall Effect
   output_spec:
-    sv2_spec_row: Rows 86–89
     sv2_spec_field_name: Type / Make/Model / Supply/Output
-  notes: If Row 61 = 'No', populate Rows 86–92 as 'Not Required'. If a separate transmitter is specified
-    (non-integral), treat as Engineered selection.
+  notes: If Position Transmitter = 'No', populate the transmitter output fields as 'Not Required'. If a separate transmitter is specified (non-integral), treat as Engineered selection.
 - id: 55
   sv2_field_name: Airset Make/Model/Qty
   extraction_type: derived
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Air Set MFR / Model (Row 72)
+    enquiry_field_name: Air Set MFR / Model
     example_value: VTA / VTA / VTA (all tags)
   logic: '''VTA'' → KSB MIL standard: Shavo SB77-276-M6KN-N, 1 No. Gauges: Yes → include pressure gauge.'
   example_output: Shavo/SB77-276-M6KN-N/1 No
@@ -1076,7 +1013,6 @@ document_extraction_fields:
   aliases: Air Set; Filter Regulator; AFR; Airset; Filter Reg Unit
   similar_values_reference: Shavo; Norgren; SMC; Parker; Watts
   output_spec:
-    sv2_spec_row: Row 67
     sv2_spec_field_name: Make/Model/Qty
   notes: 'Airset conditions instrument air (filters and regulates) before it enters positioner and actuator.
     Filter: 5 micron standard.'
@@ -1086,7 +1022,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Airset Set Pressure (Row 73) / Filter (Row 74)
+    enquiry_field_name: Airset Set Pressure / Filter
     example_value: 'By Vendor / Gauge: Yes (all tags)'
   logic: 'Set pressure = minimum available air supply (MIN) = 3.5 kgf/cm² ≈ 50 psi. Filter size: standard = 5 micron. Gauge: Yes.'
   example_output: 'Set Pressure: By Vendor / Filter: 5 Micron / Gauge: Yes'
@@ -1096,7 +1032,6 @@ document_extraction_fields:
   aliases: Set Pressure; Filter Size; Micron Rating; Filter Element
   similar_values_reference: 5 micron; 25 micron; 40 micron; 0.3 micron
   output_spec:
-    sv2_spec_row: Rows 68/73/74
     sv2_spec_field_name: Filter Size / Set Press / Gauge
 - id: 57
   sv2_field_name: Painting Scheme
@@ -1115,7 +1050,6 @@ document_extraction_fields:
   aliases: Painting; Paint Scheme; Surface Treatment; Colour Code
   similar_values_reference: RAL 7001; IT 228HS; Epoxy; Primer + Top coat
   output_spec:
-    sv2_spec_row: Row 111
     sv2_spec_field_name: Painting Scheme
   notes: 'Painting scheme varies by project. Always refer to PO painting specification. Body colour: Grey
     (IT 228HS). Actuator colour: GREEN (fail-open) or RED (fail-close).'
@@ -1125,7 +1059,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Power Failure Position (Row 9)
+    enquiry_field_name: Power Failure Position
     example_value: Open | Close | Open
   logic: Fail Open → Actuator colour GREEN. Fail Close → Actuator colour RED. Body always GREY (IT 228HS).
   example_output: GREEN | RED | GREEN
@@ -1135,7 +1069,6 @@ document_extraction_fields:
   aliases: Actuator Colour; Actuator Color; Body Colour; Colour Code
   similar_values_reference: Green; Red; Yellow; Grey
   output_spec:
-    sv2_spec_row: Row 112
     sv2_spec_field_name: Body Colour / Actuator Colour
   notes: 'Colour coding is a visual safety indicator of fail- safe position. Standard: Green = Fail Open;
     Red = Fail Close.'
@@ -1155,7 +1088,6 @@ document_extraction_fields:
   aliases: Cable Gland; Gland Type; Cable Entry Device
   similar_values_reference: Single compression; Double compression; Stopping plug; EMC gland
   output_spec:
-    sv2_spec_row: Row 130
     sv2_spec_field_name: Type
 - id: 60
   sv2_field_name: Cable Gland Certification
@@ -1163,7 +1095,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Area Classification (Row 4)
+    enquiry_field_name: Area Classification
     example_value: Zone 1 Gr. IIC T3 (all tags)
   logic: 'Zone 1 IIC → Explosion Proof: Ex d IIA, IIB, IIC. Material: SS 304 + PVC Hood. Cable Type: Flexible.'
   example_output: Explosion Proof Ex d IIA, IIB, IIC
@@ -1173,7 +1105,6 @@ document_extraction_fields:
   aliases: Cable Gland Certification; Gland Cert; Hazardous Area Gland; ATEX Gland
   similar_values_reference: Ex d; Ex e; Ex n
   output_spec:
-    sv2_spec_row: Row 131
     sv2_spec_field_name: Certification
   notes: Cable gland certification must be independent of positioner certification. Even if positioner
     is Ex ia, cable gland must be rated Ex d for Zone 1.
@@ -1183,7 +1114,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Process Fluid (Row 14/15) + Specification Notes (DS Page 2)
+    enquiry_field_name: Process Fluid / Upstream Condition + Specification Notes (DS Page 2)
     example_value: Not steam (Tag1/3); IBR Applicable (Tag2 — process notes state 'IBR Applicable')
   logic: If fluid = steam AND 'IBR' appears in DS Page 2 Spec/Process Notes → IBR applies. Valve must
     be tested and certified by IBR per Appendix L. Otherwise 'IBR Not Required'.
@@ -1194,7 +1125,6 @@ document_extraction_fields:
   aliases: IBR; Indian Boiler Regulation; Boiler Certificate; IBR Certificate
   similar_values_reference: IBR Applicable; IBR Required; Form IIIC; Not applicable to IBR
   output_spec:
-    sv2_spec_row: Rows 137/145
     sv2_spec_field_name: Special Testing/Quality Requirements
   notes: IBR certificate requires third-party inspection during manufacturing. Increases lead time by
     4-6 weeks. Flag immediately when identified.
@@ -1215,7 +1145,6 @@ document_extraction_fields:
   aliases: RT; Radiographic Testing; X-Ray; NDE; NDT
   similar_values_reference: 10% RT; 100% RT; Spot RT; UT (Ultrasonic)
   output_spec:
-    sv2_spec_row: Row 138
     sv2_spec_field_name: Special Testing/Quality Requirements
 - id: 63
   sv2_field_name: NDT — PMI Test
@@ -1234,7 +1163,6 @@ document_extraction_fields:
   aliases: PMI; Positive Material Identification; Material Test; XRF; Chemical Analysis
   similar_values_reference: PMI Standard; PMI Full; 100% PMI; PMI on castings
   output_spec:
-    sv2_spec_row: Row 142
     sv2_spec_field_name: Special Testing/Quality Requirements
   notes: PMI verifies that trim materials match specification (e.g. confirms SS 410 is not SS 304 supplied
     in error).
@@ -1244,7 +1172,7 @@ document_extraction_fields:
   requirement: conditional
   unit: —
   source:
-    enquiry_field_name: Trim/Seat Material (Rows 44/45) — triggered by Austenitic SS
+    enquiry_field_name: Trim/Seat Material — triggered by Austenitic SS
     example_value: 'Plug: 410 (13Cr) — not austenitic, trigger NOT activated for these tags'
   logic: IGC test triggered when plug/seat material contains Austenitic Stainless Steel (SS316, CF8M, CF3M, 304 etc.). SS 410 (martensitic) and Stellite do NOT trigger IGC. For these three tags, the IGC test is not triggered.
   example_output: '[1707] IGC testing as per Prac.E, 250× microstructure (applicable for Aust.SS Trim
@@ -1255,7 +1183,6 @@ document_extraction_fields:
   aliases: IGC; Intergranular Corrosion; Sensitisation Test; ASTM A262 Prac E
   similar_values_reference: IGC Test; Weld Decay Test; Sensitisation
   output_spec:
-    sv2_spec_row: Row 139
     sv2_spec_field_name: Special Testing/Quality Requirements
   notes: If trim material is changed to SS316 or CF8M in a future revision, IGC test becomes mandatory.
 - id: 65
@@ -1275,7 +1202,6 @@ document_extraction_fields:
   aliases: Operating Signature; Valve Signature; Stroke Test Record; Loop Test
   similar_values_reference: CD; PDF; Digital Report; FAT Record
   output_spec:
-    sv2_spec_row: Row 143
     sv2_spec_field_name: Special Testing/Quality Requirements
 - id: 66
   sv2_field_name: PESO Certificate
@@ -1283,7 +1209,7 @@ document_extraction_fields:
   requirement: mandatory
   unit: —
   source:
-    enquiry_field_name: Area Classification (Row 4)
+    enquiry_field_name: Area Classification
     example_value: Zone 1 Gr. IIC T3 (all tags)
   logic: Hazardous area (Zone 1 or Zone 2) → PESO certificate required for all electrical accessories
     (positioner, solenoid valve if any, limit switches if any).
@@ -1294,7 +1220,6 @@ document_extraction_fields:
   aliases: PESO; CCOE; Hazardous Area Certificate; Electrical Accessory Certificate
   similar_values_reference: PESO; CCOE; Statutory approval
   output_spec:
-    sv2_spec_row: Row 144
     sv2_spec_field_name: Special Testing/Quality Requirements
   notes: PESO (Petroleum and Explosives Safety Organisation) is the Indian statutory body. Certificate
     must be obtained before despatch. Add 4-6 weeks to delivery if not pre-certified.
