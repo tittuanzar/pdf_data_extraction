@@ -27,7 +27,7 @@ llm:
 # Postprocessing: apply engineered defaults and derived-field logic after
 # LLM extraction.  Set to false to skip (useful for debugging LLM-only output).
 postprocessing:
-  use_engineered_defaults: true     # apply KSB MIL defaults for Engineered fields
+  use_engineered_defaults: false     # apply KSB MIL defaults for Engineered fields
 
 # Which prompt keys to use (referencing names in prompts.yml, dot notation)
 prompt_keys:

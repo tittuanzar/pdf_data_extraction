@@ -151,15 +151,17 @@ class DeterministicDerivedFieldTests(unittest.TestCase):
         )
 
     def test_derive_peso_certificate(self) -> None:
-        self.assertTrue(
+        self.assertEqual(
             postprocess.derive_peso_certificate(
                 {"raw_area_classification": "Zone 1 Gr. IIC T3"}
-            )
+            ),
+            "PESO Certificate for All Electrical Accessories",
         )
-        self.assertFalse(
+        self.assertEqual(
             postprocess.derive_peso_certificate(
                 {"raw_area_classification": "Non-hazardous"}
-            )
+            ),
+            "PESO Certificate Not Required",
         )
 
     def test_derive_outlet_pressure_matches_reference_example(self) -> None:

@@ -7,7 +7,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Tag No. (Row 1)
     example_value: 1803-FV-10401 | 1803-FV-1104 | 1803-FV- 1403
-  logic: Copy tag number verbatim from top of Enquiry DS (Row 1, left column)
+  logic: Copy tag number verbatim from the tag number field at the top of the Enquiry DS.
   example_output: 1803-FV-10401 | 1803-FV-1104 | 1803- FV-1403
   dependencies:
     service_dependent: false
@@ -27,7 +27,7 @@ document_extraction_fields:
     enquiry_field_name: Service (Row 2)
     example_value: SUSPECT CONDT PUMPS(P-606A/B) MCF | LP STEAM TO E-101 PREHEATER | RCSP HOPPER R-104
       AERATION PLANT AIR
-  logic: Copy service description verbatim from Row 2 of Enquiry DS
+  logic: Copy service description verbatim from the Service field of the Enquiry DS.
   example_output: SUSPECT CONDT PUMPS(P-606A/B) MCF | LP STEAM TO E-101 PREHEATER | RCSP HOPPER R-104
     AERATION PLANT AIR
   dependencies:
@@ -47,7 +47,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Process Fluid (Row 14)
     example_value: SUSPECT LP CONDENSATE | LP Steam | PLANT AIR
-  logic: Copy fluid name from Row 14 of Enquiry DS
+  logic: Copy fluid name from the Process Fluid field of the Enquiry DS.
   example_output: SUSPECT LP CONDENSATE | Steam | Air
   dependencies:
     service_dependent: true
@@ -67,8 +67,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Upstream Condition (Row 15)
     example_value: Water | Steam | Gas/Vapor
-  logic: 'Map Row 15 value to Sv2 dropdown: Water/Liquid/Condensate → Liquid; Steam/LP Steam/HP Steam
-    → Steam; Gas/Vapor/Air/Nitrogen → Gas'
+  logic: 'Map the Upstream Condition value to Sv2 dropdown: Water/Liquid/Condensate → Liquid; Steam/LP Steam/HP Steam → Steam; Gas/Vapor/Air/Nitrogen → Gas.'
   example_output: Liquid | Steam | Gas
   dependencies:
     service_dependent: true
@@ -88,8 +87,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Line Size and Schedule — Inlet (Row 11)
     example_value: 3 in STD | 12 in XS | 6 in STD
-  logic: Extract inlet size and schedule from Row 11 Inlet column. Parse leading number as nominal size;
-    schedule follows (STD, XS, 40S etc.)
+  logic: Extract inlet size and schedule from the Line Size and Schedule (Inlet) field. Parse leading number as nominal size; schedule follows (STD, XS, 40S etc.)
   example_output: 3 in/STD | 12 in/XS | 6 in/STD
   dependencies:
     service_dependent: false
@@ -109,8 +107,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Line Size and Schedule — Outlet (Row 11)
     example_value: 3 in STD | 12 in XS | 6 in STD
-  logic: Extract outlet size and schedule from Row 11 Outlet column. Usually same as inlet unless expander
-    is fitted.
+  logic: Extract outlet size and schedule from the Line Size and Schedule (Outlet) field. Usually same as inlet unless expander is fitted.
   example_output: 3 in/STD | 12 in/XS | 6 in/STD
   dependencies:
     service_dependent: false
@@ -129,8 +126,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Design Pressure / Temperature (Row 27)
     example_value: 12 kgf/cm²-g | 8 kgf/cm²-g | 10 kgf/cm²-g
-  logic: Extract maximum design pressure from Row 27 of Enquiry DS. This is the higher of the two values
-    stated.
+  logic: Extract maximum design pressure from the Design Pressure / Temperature field of the Enquiry DS. This is the higher of the two values stated.
   example_output: 12 kgf/cm²-g | 8 kgf/cm²-g | 10 kgf/cm²-g
   dependencies:
     service_dependent: false
@@ -150,8 +146,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Design Pressure / Temperature (Row 27)
     example_value: FV kgf/cm²-g | FV kgf/cm²-g | — (not stated)
-  logic: Extract minimum design pressure from Row 27. FV = Full Vacuum = -1.033 kgf/cm²-a (or 0 absolute).
-    Carry as 'FV' text if shown.
+  logic: Extract minimum design pressure from the Design Pressure / Temperature field. FV = Full Vacuum = -1.033 kgf/cm²-a (or 0 absolute). Carry as 'FV' text if shown.
   example_output: FV | FV | —
   dependencies:
     service_dependent: false
@@ -171,7 +166,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Design Pressure / Temperature (Row 27)
     example_value: 150 °C | 220 °C | 65 °C
-  logic: Extract maximum design temperature from Row 27 of Enquiry DS.
+  logic: Extract maximum design temperature from the Design Pressure / Temperature field of the Enquiry DS.
   example_output: 150 °C | 220 °C | 65 °C
   dependencies:
     service_dependent: false
@@ -191,8 +186,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Ambient Temperature (Row 5) / Process Notes Page 2
     example_value: 4.4 °C (MDMT from process notes all 3 tags)
-  logic: MDMT (Minimum Design Metal Temperature) stated in DS Page 2 Process Notes. Not the same as ambient
-    temperature (Row 5). Extract from notes text.
+  logic: MDMT (Minimum Design Metal Temperature) is stated in the DS Page 2 Process Notes. Not the same as ambient temperature. Extract from the notes text.
   example_output: 4.4 °C | 4.4 °C | 4.4 °C
   dependencies:
     service_dependent: false
@@ -212,7 +206,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Flow Rate @ Max Flow (Row 18)
     example_value: 10.5 | 6405 | 2640
-  logic: Extract flow rate value from the '@ Max Flow' column of Row 18. Preserve units exactly as stated.
+  logic: Extract flow rate value from the '@ Max Flow' column of the Flow Rate field. Preserve units exactly as stated.
   example_output: 10.5 m³/h | 6405 kg/h | 2640 Nm³/h
   dependencies:
     service_dependent: true
@@ -232,7 +226,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Flow Rate @ Norm Flow (Row 18)
     example_value: 9.5 | 5823 | 2400
-  logic: Extract flow rate value from the '@ Norm. Flow' column of Row 18.
+  logic: Extract flow rate value from the '@ Norm. Flow' column of the Flow Rate field.
   example_output: 9.5 m³/h | 5823 kg/h | 2400 Nm³/h
   dependencies:
     service_dependent: true
@@ -252,7 +246,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Flow Rate @ Min Flow (Row 18)
     example_value: 4.8 | 2912 | 2920
-  logic: Extract flow rate value from the '@ Min. Flow' column of Row 18.
+  logic: Extract flow rate value from the '@ Min. Flow' column of the Flow Rate field.
   example_output: 4.8 m³/h | 2912 kg/h | 2920 Nm³/h
   dependencies:
     service_dependent: true
@@ -271,7 +265,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Inlet Pressure @ Max Flow (Row 19)
     example_value: 6.8 | 3.31 | 4.3
-  logic: Extract inlet pressure from '@ Max Flow' column of Row 19.
+  logic: Extract inlet pressure from the '@ Max Flow' column of the Inlet Pressure field.
   example_output: 6.8 kgf/cm²-g | 3.31 kgf/cm²-g | 4.3 kgf/cm²-g
   dependencies:
     service_dependent: false
@@ -291,7 +285,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Inlet Pressure @ Norm Flow (Row 19)
     example_value: 6.8 | 3.31 | 4.33
-  logic: Extract inlet pressure from '@ Norm. Flow' column of Row 19.
+  logic: Extract inlet pressure from the '@ Norm. Flow' column of the Inlet Pressure field.
   example_output: 6.8 kgf/cm²-g | 3.31 kgf/cm²-g | 4.33 kgf/cm²-g
   dependencies:
     service_dependent: false
@@ -309,7 +303,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Inlet Pressure @ Min Flow (Row 19)
     example_value: 6.9 | 3.32 | 4.4
-  logic: Extract inlet pressure from '@ Min. Flow' column of Row 19.
+  logic: Extract inlet pressure from the '@ Min. Flow' column of the Inlet Pressure field.
   example_output: 6.9 kgf/cm²-g | 3.32 kgf/cm²-g | 4.4 kgf/cm²-g
   dependencies:
     service_dependent: false
@@ -327,8 +321,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Not directly stated — derived from Rows 19 & 20
     example_value: 'Calculated: 6.8 - 6.57 = 0.23 | 3.31 - 0.3 = 3.01 | 4.3 - 1.72 = 2.58'
-  logic: Outlet Pressure = Inlet Pressure (Row 19) − Pressure Drop (Row 20) for each case. Sv2 requires
-    explicit outlet pressure.
+  logic: Outlet Pressure = Inlet Pressure − Pressure Drop for each case. Sv2 requires explicit outlet pressure.
   example_output: 0.23 kgf/cm²-g | 3.01 kgf/cm²-g | 2.58 kgf/cm²-g
   dependencies:
     service_dependent: false
@@ -348,7 +341,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Not directly stated — derived from Rows 19 & 20
     example_value: 'Calculated: 6.8 - 6.6 = 0.20 | 3.31 - 0.31 = 3.00 | 4.33 - 1.74 = 2.59'
-  logic: Outlet Pressure NOR = Inlet Press NOR (Row 19 NOR) − Pressure Drop NOR (Row 20 NOR)
+  logic: Outlet Pressure NOR = Inlet Pressure NOR − Pressure Drop NOR.
   example_output: 0.20 kgf/cm²-g | 3.00 kgf/cm²-g | 2.59 kgf/cm²-g
   dependencies:
     service_dependent: false
@@ -366,7 +359,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Not directly stated — derived from Rows 19 & 20
     example_value: 'Calculated: 6.9 - 6.7 = 0.20 | 3.32 - 0.32 = 3.00 | 4.4 - 1.83 = 2.57'
-  logic: Outlet Pressure MIN = Inlet Press MIN (Row 19 MIN) − Pressure Drop MIN (Row 20 MIN)
+  logic: Outlet Pressure MIN = Inlet Pressure MIN − Pressure Drop MIN.
   example_output: 0.20 kgf/cm²-g | 3.00 kgf/cm²-g | 2.57 kgf/cm²-g
   dependencies:
     service_dependent: false
@@ -384,7 +377,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Pressure Drop @ Max Flow (Row 20)
     example_value: 6.57 | 0.3 | 1.72
-  logic: Extract pressure drop from '@ Max Flow' column of Row 20.
+  logic: Extract pressure drop from the '@ Max Flow' column of the Pressure Drop field.
   example_output: 6.57 kgf/cm² | 0.3 kgf/cm² | 1.72 kgf/cm²
   dependencies:
     service_dependent: false
@@ -403,7 +396,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Pressure Drop @ Norm Flow (Row 20)
     example_value: 6.6 | 0.31 | 1.74
-  logic: Extract pressure drop from '@ Norm. Flow' column of Row 20.
+  logic: Extract pressure drop from the '@ Norm. Flow' column of the Pressure Drop field.
   example_output: 6.6 kgf/cm² | 0.31 kgf/cm² | 1.74 kgf/cm²
   dependencies:
     service_dependent: false
@@ -421,7 +414,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Pressure Drop @ Min Flow (Row 20)
     example_value: 6.7 | 0.32 | 1.83
-  logic: Extract pressure drop from '@ Min. Flow' column of Row 20.
+  logic: Extract pressure drop from the '@ Min. Flow' column of the Pressure Drop field.
   example_output: 6.7 kgf/cm² | 0.32 kgf/cm² | 1.83 kgf/cm²
   dependencies:
     service_dependent: false
@@ -439,7 +432,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Inlet Temperature @ Max Flow (Row 21)
     example_value: 99.9 | 160 | 40
-  logic: Extract temperature from '@ Max Flow' column of Row 21.
+  logic: Extract temperature from the '@ Max Flow' column of the Inlet Temperature field.
   example_output: 99.9 °C | 160 °C | 40 °C
   dependencies:
     service_dependent: true
@@ -458,7 +451,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Inlet Temperature @ Norm Flow (Row 21)
     example_value: 99.9 | 160 | 40
-  logic: Extract temperature from '@ Norm. Flow' column of Row 21.
+  logic: Extract temperature from the '@ Norm. Flow' column of the Inlet Temperature field.
   example_output: 99.9 °C | 160 °C | 40 °C
   dependencies:
     service_dependent: true
@@ -476,7 +469,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Inlet Temperature @ Min Flow (Row 21)
     example_value: 99.99 | 160 | 40
-  logic: Extract temperature from '@ Min. Flow' column of Row 21.
+  logic: Extract temperature from the '@ Min. Flow' column of the Inlet Temperature field.
   example_output: 99.99 °C | 160 °C | 40 °C
   dependencies:
     service_dependent: true
@@ -494,8 +487,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Inlet Density / Specific Gravity / Molecular Mass (Row 22)
     example_value: 955 kg/m³ (SG=0.955) | — (steam) | 28.96 (MW)
-  logic: 'Liquid service: Row 22 gives density in kg/m³ → divide by 1000 to get SG (e.g. 955/1000 = 0.955).
-    Gas service: Row 22 gives MW in g/mol (e.g. 28.96 for air). Steam service: leave blank; Sv2 uses steam'
+  logic: 'Liquid service: the density field gives density in kg/m3 → divide by 1000 to get SG (e.g. 955/1000 = 0.955). Gas service: the field gives MW in g/mol (e.g. 28.96 for air). Steam service: leave blank; Sv2 uses steam tables.'
   example_output: SG = 0.955 | Blank (steam) | MW = 28.96 g/mol
   dependencies:
     service_dependent: true
@@ -515,7 +507,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Inlet Viscosity (Row 24)
     example_value: 0.276 | 0.014 | 0.0191
-  logic: tables. Copy viscosity value from Row 24 of Enquiry DS.
+  logic: Copy viscosity value from the Viscosity field of the Enquiry DS.
   example_output: 0.276 cP | 0.014 cP | 0.0191 cP
   dependencies:
     service_dependent: true
@@ -535,8 +527,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Inlet Compressibility Factor (Row 23)
     example_value: — (liquid; not applicable) | — (steam) | 0.999
-  logic: Extract Z from Row 23. Applicable for gas/vapour only. Leave blank for liquid and steam (Sv2
-    applies steam tables).
+  logic: Extract Z from the Compressibility Factor field. Applicable for gas/vapour only. Leave blank for liquid and steam (Sv2 applies steam tables).
   example_output: N/A (liquid) | N/A (steam) | 0.999
   dependencies:
     service_dependent: true
@@ -555,7 +546,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Inlet Specific Heats Ratio (Row 25)
     example_value: — (liquid; not applicable) | 1.317 (steam) | 1.4 (air)
-  logic: Extract K from Row 25. Applicable for gas and steam only. Leave blank for liquid services.
+  logic: Extract K from the Specific Heats Ratio field. Applicable for gas and steam only. Leave blank for liquid services.
   example_output: N/A (liquid) | 1.317 | 1.4
   dependencies:
     service_dependent: true
@@ -575,8 +566,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Inlet Vapour Pressure (Row 26)
     example_value: 1.031 kgf/cm²-a | — (steam; not applicable) | — (gas; not applicable)
-  logic: Extract vapour pressure from Row 26. Applicable for liquid services only. Used to check cavitation
-    and flashing.
+  logic: Extract vapour pressure from the Vapour Pressure field. Applicable for liquid services only. Used to check cavitation and flashing.
   example_output: 1.031 kgf/cm²-a | N/A | N/A
   dependencies:
     service_dependent: true
@@ -595,7 +585,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Body Type (Row 32)
     example_value: Single Seat Globe | Single Seat Globe | Single Seat Globe
-  logic: Copy body type from Row 32 of Enquiry DS verbatim.
+  logic: Copy body type from the Body Type field of the Enquiry DS verbatim.
   example_output: Single Seat Globe | Single Seat Globe | Single Seat Globe
   dependencies:
     service_dependent: true
@@ -614,8 +604,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Body Material (Row 36)
     example_value: F.S. ASTM A105 Normalized | C.S. ASTM A216 WCB | C.S. ASTM A216 WCB
-  logic: Copy body material specification verbatim from Row 36 of Enquiry DS. This is fully stated by
-    the customer.
+  logic: Copy body material specification verbatim from the Body Material field of the Enquiry DS. This is fully stated by the customer.
   example_output: F.S. ASTM A105 Normalized | ASTM A216 Gr. WCC | ASTM A216 Gr. WCC
   dependencies:
     service_dependent: true
@@ -635,7 +624,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Bonnet Type / Material (Row 37)
     example_value: Bolted Flange A105 | Bolted Flange A216 WCB | Bolted Flange A216 WCB
-  logic: Copy bonnet type and material from Row 37 of Enquiry DS.
+  logic: Copy bonnet type and material from the Bonnet Type / Material field of the Enquiry DS.
   example_output: Bolted Flange A105 | Bolted Flange A216 WCB | Bolted Flange A216 WCB
   dependencies:
     service_dependent: true
@@ -655,7 +644,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Flow Direction (Row 38)
     example_value: FTC (Flow-To-Close) | FTO (Flow-To-Open) | FTO (Flow-To-Open)
-  logic: Copy flow direction from Row 38 of Enquiry DS. FTC = Flow-To-Close; FTO = Flow-To-Open.
+  logic: Copy flow direction from the Flow Direction field of the Enquiry DS. FTC = Flow-To-Close; FTO = Flow-To-Open.
   example_output: Flow to close | Flow to open | Flow to open
   dependencies:
     service_dependent: true
@@ -675,7 +664,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: End Connec. & Rating (Row 35)
     example_value: 1.5" 300# RF | 8" 300# RF | 4" 300# RF
-  logic: Copy end connection type, size, and rating from Row 35 of Enquiry DS.
+  logic: Copy end connection type, size, and rating from the End Connec. & Rating field of the Enquiry DS.
   example_output: Flanged-ASME 300 RF | Flanged-ASME 300 RF | Flanged-ASME 300 RF
   dependencies:
     service_dependent: false
@@ -695,9 +684,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Characteristic (Rated Cv / Characteristic Row 34)
     example_value: Linear | Equal% | Linear
-  logic: 'Row 34 shows ''By Vendor | Equal% | By Vendor''. For ''By Vendor'', engineer selects based on
-    process control requirements: Equal Percentage for pressure- drop ratio > 0.3; Linear for most other
-    cases.'
+  logic: 'When the Characteristic field shows ''By Vendor'', engineer selects based on process control requirements: Equal Percentage for pressure-drop ratio > 0.3; Linear for most other cases. Otherwise copy the stated characteristic.'
   example_output: Linear | Equal % | Linear
   dependencies:
     service_dependent: true
@@ -717,7 +704,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Trim Type (Row 42)
     example_value: Low Noise Trim | Contoured Trim | Low Noise Trim
-  logic: Copy trim type from Row 42 of Enquiry DS verbatim.
+  logic: Copy trim type from the Trim Type field of the Enquiry DS verbatim.
   example_output: Low Noise Trim (Anti-Cavitation) | Contoured Trim | Low Noise Trim
   dependencies:
     service_dependent: true
@@ -737,7 +724,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Plug / Ball / Disk Material (Row 44)
     example_value: 410 (13Cr) | 410 (13Cr) | 410 (13Cr)
-  logic: Copy plug material from Row 44 of Enquiry DS verbatim.
+  logic: Copy plug material from the Plug / Ball / Disk Material field of the Enquiry DS verbatim.
   example_output: SS 410 + Stellite No.6 | SS 410 + Stellite No.6 | SS 410 + Stellite No.6
   dependencies:
     service_dependent: true
@@ -757,7 +744,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Seat Material (Row 45)
     example_value: St Gr6 (CoCrAlloy) | St Gr6 (CoCrAlloy) | St Gr6 (CoCrAlloy)
-  logic: Copy seat material from Row 45 of Enquiry DS verbatim.
+  logic: Copy seat material from the Seat Material field of the Enquiry DS verbatim.
   example_output: SS 410 + Stellite No.6 | SS 410 + Stellite No.6 | SS 410 + Stellite No.6
   dependencies:
     service_dependent: true
@@ -819,7 +806,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Type (Actuator) (Row 50)
     example_value: Spring Diaphragm | Spring Diaphragm | Spring Diaphragm
-  logic: Copy actuator type from Row 50 of Enquiry DS.
+  logic: Copy actuator type from the Type (Actuator) field of the Enquiry DS.
   example_output: Pneumatic Spring Diaphragm | Pneumatic Spring Diaphragm | Pneumatic Spring Diaphragm
   dependencies:
     service_dependent: false
@@ -839,8 +826,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Power Failure Position (Row 9) + Air Failure Valve (Row 52)
     example_value: Open (R9) / Open (R52) | Close (R9) / Close (R52) | Open (R9) / Open (R52)
-  logic: 'Row 9 = Power Failure Position (safe position on air loss). Map: Fail Open → Air to Close (ATC);
-    Fail Close → Air to Open (ATO). Row 52 confirms. Cross- check both rows.'
+  logic: 'The Power Failure Position field gives the safe position on air loss. Map: Fail Open → Air to Close (ATC); Fail Close → Air to Open (ATO). Cross-check against the Air Failure Valve field for confirmation.'
   example_output: Air to Close (ATC) | Air to Open (ATO) | Air to Close (ATC)
   dependencies:
     service_dependent: true
@@ -860,8 +846,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Available Air Supply Pressure (Row 8)
     example_value: Min 3.5 kgf/cm² / Max 7 kgf/cm² (all tags)
-  logic: 'Use minimum available supply pressure from Row 8. Convert to psi: × 14.223. Round to nearest
-    standard value. 3.5 kgf/cm² × 14.223 ≈ 50 psi.'
+  logic: 'Use the minimum available supply pressure from the Available Air Supply Pressure field. Convert to psi: × 14.223. Round to nearest standard value. 3.5 kgf/cm² × 14.223 ≈ 50 psi.'
   example_output: 50 psi (all tags)
   dependencies:
     service_dependent: false
@@ -903,8 +888,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Actuator Design Pressure (Row 10)
     example_value: Not stated in Enquiry DS — derived from Row 27 Design Pressure
-  logic: (Tag2). Shut-off pressure = maximum design pressure of valve (Row 27 MAX). KSB MIL DS Row 57
-    shows this value.
+  logic: Shut-off pressure = maximum design pressure of the valve (Design Pressure MAX).
   example_output: 12 kgf/cm² (Tag1) | 8 kgf/cm² (Tag2) | 10 kgf/cm² (Tag3)
   dependencies:
     service_dependent: false
@@ -924,8 +908,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Handwheel (Row 53)
     example_value: — (dash; not specified) | — (dash) | Side Mounted
-  logic: Copy handwheel requirement from Row 53. '—' or blank = No handwheel. 'Side Mounted' = side- mounted
-    handwheel assembly.
+  logic: Copy handwheel requirement from the Handwheel field. '-' or blank = No handwheel. 'Side Mounted' = side-mounted handwheel assembly.
   example_output: No/NA | No/NA | Yes/6A2 (Side Mounted)
   dependencies:
     service_dependent: false
@@ -1065,8 +1048,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Position Transmitter (Row 61)
     example_value: Yes. 4-20mA+Hart (all tags)
-  logic: '''Yes'' → Position transmitter is integral to the smart positioner (METSO ND9103). No separate
-    device. Mounting: Integral to Smart Positioner. Output: 24 VDC / 4-20 mA (voltage from Row 62).'
+  logic: '''Yes'' → Position transmitter is integral to the smart positioner (METSO ND9103). No separate device. Mounting: Integral to Smart Positioner. Output: 24 VDC / 4-20 mA.'
   example_output: Integral to Smart Positioner / 24 VDC / 4- 20mA
   dependencies:
     service_dependent: false
@@ -1086,8 +1068,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Air Set MFR / Model (Row 72)
     example_value: VTA / VTA / VTA (all tags)
-  logic: 'VTA → KSB MIL standard: Shavo SB77-276-M6KN- N, 1 No. Gauges: Yes (Row 74) → include pressure
-    gauge.'
+  logic: '''VTA'' → KSB MIL standard: Shavo SB77-276-M6KN-N, 1 No. Gauges: Yes → include pressure gauge.'
   example_output: Shavo/SB77-276-M6KN-N/1 No
   dependencies:
     service_dependent: false
@@ -1107,8 +1088,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Airset Set Pressure (Row 73) / Filter (Row 74)
     example_value: 'By Vendor / Gauge: Yes (all tags)'
-  logic: 'Set pressure = minimum available air supply (Row 8 MIN) = 3.5 kgf/cm² ≈ 50 psi. Filter size:
-    standard = 5 micron. Gauge: Yes.'
+  logic: 'Set pressure = minimum available air supply (MIN) = 3.5 kgf/cm² ≈ 50 psi. Filter size: standard = 5 micron. Gauge: Yes.'
   example_output: 'Set Pressure: By Vendor / Filter: 5 Micron / Gauge: Yes'
   dependencies:
     service_dependent: false
@@ -1147,8 +1127,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Power Failure Position (Row 9)
     example_value: Open | Close | Open
-  logic: Fail Open (Row 9 = Open) → Actuator colour GREEN. Fail Close (Row 9 = Close) → Actuator colour
-    RED. Body always GREY (IT 228HS).
+  logic: Fail Open → Actuator colour GREEN. Fail Close → Actuator colour RED. Body always GREY (IT 228HS).
   example_output: GREEN | RED | GREEN
   dependencies:
     service_dependent: false
@@ -1168,8 +1147,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Not in Enquiry DS
     example_value: Not stated
-  logic: 'KSB MIL standard: Double compression type. Certification derived from Area Classification (Row
-    4).'
+  logic: 'KSB MIL standard: Double compression type. Certification derived from the Area Classification field.'
   example_output: Double compression type
   dependencies:
     service_dependent: false
@@ -1268,9 +1246,7 @@ document_extraction_fields:
   source:
     enquiry_field_name: Trim/Seat Material (Rows 44/45) — triggered by Austenitic SS
     example_value: 'Plug: 410 (13Cr) — not austenitic, trigger NOT activated for these tags'
-  logic: 'IGC test triggered when plug/seat material contains Austenitic Stainless Steel (SS316, CF8M,
-    CF3M, 304 etc.). SS 410 (martensitic) and Stellite do NOT trigger IGC. For these three tags: IGC row
-    is'
+  logic: IGC test triggered when plug/seat material contains Austenitic Stainless Steel (SS316, CF8M, CF3M, 304 etc.). SS 410 (martensitic) and Stellite do NOT trigger IGC. For these three tags, the IGC test is not triggered.
   example_output: '[1707] IGC testing as per Prac.E, 250× microstructure (applicable for Aust.SS Trim
     Parts)'
   dependencies:

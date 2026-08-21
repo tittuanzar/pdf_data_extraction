@@ -69,7 +69,7 @@ ENGINEERED_DEFAULTS: dict[str, str | Callable[[PartialSV2ValveDatasheet], str]] 
     "positioner_type": "Smart Single Acting (HART)",
     # serial 45 — reference guide states this cannot be determined from the
     # enquiry DS alone; placeholder MUST be verified by the engineer.
-    "bench_range": "By Vendor — ENGINEER TO VERIFY",
+    "bench_range": "",
     # serial 41 — service-dependent, see _default_guiding.
     "guiding": _default_guiding,
 }
