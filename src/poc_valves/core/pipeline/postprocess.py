@@ -192,7 +192,7 @@ def derive_compressibility_factor_z(
         - Liquid / Steam: N/A — leave blank.
         - For ideal gases Z = 1.0.
     """
-    if tag.compressibility_factor_z is not None:
+    if not _is_empty_or_placeholder(tag.compressibility_factor_z):
         return None  # already populated
 
     if _is_gas_phase(tag):
@@ -212,7 +212,7 @@ def derive_specific_heats_ratio_k(
         - Steam: default 1.3.
         - Liquid: N/A.
     """
-    if tag.specific_heats_ratio_k is not None:
+    if not _is_empty_or_placeholder(tag.specific_heats_ratio_k):
         return None  # already populated
 
     if _is_steam_phase(tag):
@@ -225,12 +225,23 @@ def derive_specific_heats_ratio_k(
     return "N/A (liquid)"
 
 
+_DASH_PLACEHOLDER_RE = re.compile(r"^[-‐-―]+$")
+
+
 def _is_empty_or_placeholder(value: Optional[str]) -> bool:
-    """Check if a field is None, blank, or a zero placeholder."""
+    """Check if a field is None, blank, a zero, or a dash placeholder.
+
+    Enquiry PDFs commonly render "not applicable" cells as a bare
+    dash (``-``, ``--``, en/em-dash); the LLM extractor copies that
+    literal through as a non-``None`` value, so it must be treated as
+    empty here or downstream derivation rules never fire.
+    """
     if value is None:
         return True
     stripped = value.strip()
     if not stripped:
+        return True
+    if _DASH_PLACEHOLDER_RE.match(stripped):
         return True
     num = _parse_numeric(stripped)
     if num is not None and num == 0.0:
@@ -498,7 +509,7 @@ def postprocess_tag(
             )
 
     # Compressibility Factor Z — default 1.0 for gas services
-    if tag.compressibility_factor_z is None:
+    if _is_empty_or_placeholder(tag.compressibility_factor_z):
         derived = derive_compressibility_factor_z(tag)
         if derived:
             updates["compressibility_factor_z"] = derived
@@ -507,7 +518,7 @@ def postprocess_tag(
             )
 
     # Specific Heats Ratio K — 1.4 for gas, 1.3 for steam
-    if tag.specific_heats_ratio_k is None:
+    if _is_empty_or_placeholder(tag.specific_heats_ratio_k):
         derived = derive_specific_heats_ratio_k(tag)
         if derived:
             updates["specific_heats_ratio_k"] = derived
@@ -650,12 +661,12 @@ def apply_pre_llm_derivations(
         if derived:
             updates["actuator_colour"] = derived
 
-    if tag.compressibility_factor_z is None:
+    if _is_empty_or_placeholder(tag.compressibility_factor_z):
         derived = derive_compressibility_factor_z(tag)
         if derived:
             updates["compressibility_factor_z"] = derived
 
-    if tag.specific_heats_ratio_k is None:
+    if _is_empty_or_placeholder(tag.specific_heats_ratio_k):
         derived = derive_specific_heats_ratio_k(tag)
         if derived:
             updates["specific_heats_ratio_k"] = derived

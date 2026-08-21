@@ -23,14 +23,15 @@
                                  │
               ┌──────────────────┼──────────────────┐
               ▼                  ▼                   ▼
-   ┌─────────────────┐ ┌────────────────┐ ┌────────────────────┐
-   │  PDF EXTRACTION  │ │  LLM PIPELINE  │ │  EXCEL GENERATION  │
-   │   (pdfplumber)   │ │  (OpenAI GPT)  │ │    (openpyxl)      │
-   └────────┬────────┘ └───────┬────────┘ └─────────┬──────────┘
-            │                  │                     │
-            ▼                  ▼                     ▼
-    Pages + Tables     ParsedOutput            .xlsx download
-    (per page)         (list of tags)          (per-tag sheets)
+   ┌──────────────────┐ ┌────────────────────────────┐ ┌────────────────────┐
+   │  PDF EXTRACTION  │ │   LLM PIPELINE (3-phase)   │ │  EXCEL GENERATION  │
+   │   (pdfplumber)   │ │  (OpenAI GPT → tags list)  │ │     (openpyxl)     │
+   └─────────┬────────┘ └──────────────┬─────────────┘ └──────────┬─────────┘
+             │                         │                          │
+             ▼                         ▼                          ▼
+      Pages + Tables ParsedOutput.tags: [Tag1, Tag2, ...]  .xlsx download
+        (per page)    (LLM parses grouped pages into one  (per-tag sheets)
+                       SV2ValveDatasheet per tag found)
 ```
 
 ---

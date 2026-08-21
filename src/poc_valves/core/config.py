@@ -55,6 +55,7 @@ _ENV_OVERRIDES: dict[str, str] = {
     "OPENAI_PROMPT_COST_PER_1K": "llm.prompt_cost_per_1k",
     "OPENAI_COMPLETION_COST_PER_1K": "llm.completion_cost_per_1k",
     "OPENAI_USD_TO_INR_RATE": "llm.usd_to_inr_rate",
+    "SV2_LLM_MAX_CONCURRENCY": "llm.max_concurrency",
     "POSTPROCESSING_USE_ENGINEERED_DEFAULTS": (
         "postprocessing.use_engineered_defaults"
     ),
@@ -153,6 +154,12 @@ class _Settings:
         """Return the static USD -> INR conversion rate used for the Rs
         figure shown alongside USD cost in logs."""
         return float(self.llm.get("usd_to_inr_rate", 0.0))
+
+    @property
+    def max_concurrency(self) -> int:
+        """Return the max number of concurrent tag-wise LLM extraction
+        calls the SV2 pipeline issues at once."""
+        return int(self.llm.get("max_concurrency", 5))
 
     # Postprocessing sub-dict
     @property

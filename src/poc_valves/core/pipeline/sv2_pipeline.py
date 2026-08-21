@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import logging
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 
 from ..config import settings
@@ -134,6 +135,77 @@ class SV2Pipeline:
             else use_engineered_defaults
         )
 
+    def _process_group(
+        self, index: int, group: list[dict], guide: Optional[str]
+    ) -> tuple[int, SV2ValveDatasheet, dict[str, int], float]:
+        """Run Phases 1-3 for a single tag's page group.
+
+        Returns ``(index, finalized_tag, usage, cost)``. ``index`` is the
+        group's position in the original ``page_groups`` list, used by the
+        caller to restore output order after concurrent execution; usage/
+        cost are this tag's own totals, not accumulated into any shared
+        state here, so the caller can merge them without a lock.
+        """
+        p = _merge_page_group(group)
+        page_num = int(p.get("page_number", 0) or 0)
+        logger.info(
+            "Three-phase pipeline: processing tag starting at page %s "
+            "(%d page(s) in group)",
+            page_num,
+            len(group),
+        )
+
+        usage_total: dict[str, int] = {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+        }
+        cost_total = 0.0
+
+        # --- Phase 1: direct + auxiliary verbatim extraction ---
+        direct_values, aux_values, usage, cost = self.extractor.extract_page(
+            p.get("text", ""),
+            page_num,
+            image_b64=p.get("image_b64", ""),
+            tables=p.get("tables"),
+            guide=guide,
+        )
+        _accumulate_usage(usage_total, usage)
+        cost_total += cost
+
+        partial = PartialSV2ValveDatasheet(**direct_values)
+
+        # --- Phase 2: derived fields ---
+        partial = postprocess.apply_pre_llm_derivations(partial, aux_values)
+        try:
+            judgment, usage, cost = self.extractor.derive_judgment_fields(
+                partial, aux_values
+            )
+            _accumulate_usage(usage_total, usage)
+            cost_total += cost
+            judgment_updates = {
+                k: v
+                for k, v in judgment.model_dump().items()
+                if v is not None and getattr(partial, k, None) is None
+            }
+            if judgment_updates:
+                partial = partial.model_copy(update=judgment_updates)
+        except Exception:
+            logger.exception(
+                "Phase 2 LLM judgment call failed for tag %s; "
+                "continuing with deterministic derivations only",
+                direct_values.get("tag_no"),
+            )
+        partial = postprocess.apply_post_llm_derivations(partial, aux_values)
+
+        # --- Phase 3: engineered defaults ---
+        partial = postprocess.apply_engineered_defaults(
+            partial,
+            use_engineered_defaults=self._use_engineered_defaults,
+        )
+
+        return index, _finalize_tag(partial), usage_total, cost_total
+
     def run(
         self, pages: list[dict], guide: Optional[str] = None
     ) -> ParsedOutput:
@@ -154,68 +226,33 @@ class SV2Pipeline:
         }
         total_cost = 0.0
 
-        tags: list[SV2ValveDatasheet] = []
-        for group in page_groups:
-            p = _merge_page_group(group)
-            page_num = int(p.get("page_number", 0) or 0)
-            logger.info(
-                "Three-phase pipeline: processing tag starting at page %s "
-                "(%d page(s) in group)",
-                page_num,
-                len(group),
-            )
+        tags_by_index: dict[int, SV2ValveDatasheet] = {}
 
-            # --- Phase 1: direct + auxiliary verbatim extraction ---
-            direct_values, aux_values, usage, cost = (
-                self.extractor.extract_page(
-                    p.get("text", ""),
-                    page_num,
-                    image_b64=p.get("image_b64", ""),
-                    tables=p.get("tables"),
-                    guide=guide,
-                )
-            )
-            _accumulate_usage(total_usage, usage)
-            total_cost += cost
+        # Force the OpenAI client to be constructed on this (main) thread
+        # before any worker thread touches it. LLMClient.client lazily
+        # builds and caches the OpenAI() client with a check-then-act
+        # pattern that isn't safe if two worker threads race on first use.
+        self.extractor.llm.client
 
-            partial = PartialSV2ValveDatasheet(**direct_values)
-
-            # --- Phase 2: derived fields ---
-            partial = postprocess.apply_pre_llm_derivations(
-                partial, aux_values
-            )
-            try:
-                judgment, usage, cost = (
-                    self.extractor.derive_judgment_fields(
-                        partial, aux_values
-                    )
-                )
+        # Each tag's page group is processed independently (own LLM calls,
+        # own local state), so they're run concurrently instead of one
+        # after another - this is the dominant cost in the pipeline.
+        with ThreadPoolExecutor(
+            max_workers=settings.max_concurrency
+        ) as executor:
+            futures = [
+                executor.submit(self._process_group, i, group, guide)
+                for i, group in enumerate(page_groups)
+            ]
+            for future in as_completed(futures):
+                index, tag, usage, cost = future.result()
+                tags_by_index[index] = tag
                 _accumulate_usage(total_usage, usage)
                 total_cost += cost
-                judgment_updates = {
-                    k: v
-                    for k, v in judgment.model_dump().items()
-                    if v is not None and getattr(partial, k, None) is None
-                }
-                if judgment_updates:
-                    partial = partial.model_copy(update=judgment_updates)
-            except Exception:
-                logger.exception(
-                    "Phase 2 LLM judgment call failed for tag %s; "
-                    "continuing with deterministic derivations only",
-                    direct_values.get("tag_no"),
-                )
-            partial = postprocess.apply_post_llm_derivations(
-                partial, aux_values
-            )
 
-            # --- Phase 3: engineered defaults ---
-            partial = postprocess.apply_engineered_defaults(
-                partial,
-                use_engineered_defaults=self._use_engineered_defaults,
-            )
-
-            tags.append(_finalize_tag(partial))
+        tags: list[SV2ValveDatasheet] = [
+            tags_by_index[i] for i in range(len(page_groups))
+        ]
 
         logger.info(
             "Three-phase pipeline TOTAL usage for this request: %d tag(s) "
