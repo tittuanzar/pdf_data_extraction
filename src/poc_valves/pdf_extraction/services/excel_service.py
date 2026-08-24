@@ -107,7 +107,8 @@ def generate_output_excel(
                 {"Metric": "Partial Matches", "Value": summary["counts"]["partial_match"]},
                 {"Metric": "Mismatches", "Value": summary["counts"]["mismatch"]},
                 {"Metric": "Not Applicable (no ground truth)", "Value": summary["counts"]["not_applicable"]},
-                {"Metric": "Overall Accuracy %", "Value": summary["accuracy_pct"]},
+                #{"Metric": "Overall Accuracy %", "Value": summary["accuracy_pct"]},
+                {"Metric": "Overall Accuracy %", "Value": f"{summary['accuracy_pct']:.1f}"},
             ])
 
             summary_df.to_excel(
