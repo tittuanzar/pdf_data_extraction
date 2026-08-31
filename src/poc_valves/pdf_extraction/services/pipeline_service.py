@@ -28,6 +28,7 @@ from poc_valves.pdf_extraction.services.redis_service import (
 from poc_valves.pdf_extraction.services.extraction_service import extract_category
 from poc_valves.pdf_extraction.services.accuracy_service import evaluate_accuracy
 from poc_valves.pdf_extraction.services.excel_service import generate_output_excel
+from poc_valves.pdf_extraction.services.usage_service import UsageTracker
 
 
 class PdfExtractionPipeline:
@@ -96,6 +97,7 @@ class PdfExtractionPipeline:
 
         request_id = str(uuid.uuid4())
         temp_pdf = None
+        tracker = UsageTracker()
 
         try:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp:
@@ -108,7 +110,7 @@ class PdfExtractionPipeline:
 
             pages = extract_pdf_pages(temp_pdf)
 
-            classification = classify_pages(main_category_map, pages)
+            classification = classify_pages(main_category_map, pages, tracker=tracker)
             classification_map = {
                 item["page_number"]: item["categories"]
                 for item in classification["pages"]
@@ -121,7 +123,7 @@ class PdfExtractionPipeline:
             ]
             main_category_embeddings = dict(zip(
                 main_category_names,
-                create_embeddings(main_category_texts)
+                create_embeddings(main_category_texts, tracker=tracker)
             ))
 
             all_parameters = [
@@ -135,11 +137,11 @@ class PdfExtractionPipeline:
             ]
             parameter_embeddings = dict(zip(
                 [p["ext_id"] for p in all_parameters],
-                create_embeddings(parameter_texts)
+                create_embeddings(parameter_texts, tracker=tracker)
             ))
 
             page_embeddings = create_embeddings(
-                [page["content"] for page in pages]
+                [page["content"] for page in pages], tracker=tracker
             )
 
             for page, embedding in zip(pages, page_embeddings):
@@ -186,6 +188,7 @@ class PdfExtractionPipeline:
                     parameters=parameters,
                     pages=category_pages,
                     parameter_page_hints=parameter_page_hints,
+                    tracker=tracker,
                 )
 
                 return result.get("results", [])
@@ -207,6 +210,7 @@ class PdfExtractionPipeline:
             accuracy_map = evaluate_accuracy(
                 configuration_df=configuration_df,
                 extraction_results=all_results,
+                tracker=tracker,
             )
 
             output_file = f"output/{request_id}_extracted.xlsx"
@@ -216,6 +220,10 @@ class PdfExtractionPipeline:
                 extraction_results=all_results,
                 output_path=output_file,
                 accuracy_map=accuracy_map,
+            )
+
+            tracker.log_summary(
+                label=f"Generic PDF extraction pipeline (request {request_id})"
             )
 
             return output_file

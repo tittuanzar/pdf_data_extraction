@@ -1,13 +1,16 @@
+from typing import Optional
+
 import numpy as np
 from openai import OpenAI
 
 from poc_valves.pdf_extraction.core.config import settings
+from poc_valves.pdf_extraction.services.usage_service import UsageTracker
 
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 
-def create_embedding(text: str):
+def create_embedding(text: str, tracker: Optional[UsageTracker] = None):
     """Embeds a single piece of text."""
 
     response = client.embeddings.create(
@@ -15,10 +18,13 @@ def create_embedding(text: str):
         input=text
     )
 
+    if tracker is not None:
+        tracker.add_embedding_usage(response.usage, label="Embedding")
+
     return response.data[0].embedding
 
 
-def create_embeddings(texts: list):
+def create_embeddings(texts: list, tracker: Optional[UsageTracker] = None):
     """
     Embeds a batch of texts in a single API call. Order of the
     returned list matches the order of `texts`. Used to embed all
@@ -33,6 +39,9 @@ def create_embeddings(texts: list):
         model=settings.OPENAI_EMBEDDING_MODEL,
         input=texts
     )
+
+    if tracker is not None:
+        tracker.add_embedding_usage(response.usage, label="Embedding batch")
 
     return [item.embedding for item in response.data]
 

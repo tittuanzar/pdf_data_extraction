@@ -1,11 +1,14 @@
 import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+from typing import Optional
 
 from openai import OpenAI
 
 from poc_valves.pdf_extraction.core.config import settings
 from poc_valves.pdf_extraction.prompts.accuracy_prompt import build_accuracy_prompt
+from poc_valves.pdf_extraction.services.usage_service import UsageTracker
 
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
@@ -29,7 +32,7 @@ def _chunk(items, size):
         yield items[i:i + size]
 
 
-def _evaluate_batch(batch: list):
+def _evaluate_batch(batch: list, tracker: Optional[UsageTracker] = None):
 
     prompt = build_accuracy_prompt(batch)
 
@@ -54,6 +57,9 @@ def _evaluate_batch(batch: list):
         ]
     )
 
+    if tracker is not None:
+        tracker.add_chat_usage(response.usage, label="Accuracy batch")
+
     content = json.loads(response.choices[0].message.content)
 
     comparisons = content.get("comparisons", [])
@@ -76,7 +82,8 @@ def _evaluate_batch(batch: list):
 def evaluate_accuracy(
     configuration_df,
     extraction_results: list,
-    batch_size: int = None
+    batch_size: int = None,
+    tracker: Optional[UsageTracker] = None,
 ):
     """
     Compares each row's ground-truth value (from the "Ground Truth Value"
@@ -141,7 +148,9 @@ def evaluate_accuracy(
     # Batches are scored independently, so they're run concurrently
     # (bounded by LLM_MAX_CONCURRENCY) instead of one after another.
     with ThreadPoolExecutor(max_workers=settings.LLM_MAX_CONCURRENCY) as executor:
-        for result in executor.map(_evaluate_batch, batches):
+        for result in executor.map(
+            partial(_evaluate_batch, tracker=tracker), batches
+        ):
             accuracy_map.update(result)
 
     logger.info(

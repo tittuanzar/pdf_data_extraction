@@ -1,8 +1,11 @@
 import json
+from typing import Optional
+
 from openai import OpenAI
 
 from poc_valves.pdf_extraction.core.config import settings
 from poc_valves.pdf_extraction.prompts.extraction_prompt import build_extraction_prompt
+from poc_valves.pdf_extraction.services.usage_service import UsageTracker
 
 
 client = OpenAI(api_key=settings.OPENAI_API_KEY)
@@ -12,7 +15,8 @@ def extract_category(
     category: str,
     parameters: list,
     pages: list,
-    parameter_page_hints: dict = None
+    parameter_page_hints: dict = None,
+    tracker: Optional[UsageTracker] = None,
 ):
 
     prompt = build_extraction_prompt(
@@ -39,6 +43,11 @@ def extract_category(
             }
         ]
     )
+
+    if tracker is not None:
+        tracker.add_chat_usage(
+            response.usage, label=f"Category extraction ({category})"
+        )
 
     content = response.choices[0].message.content
 

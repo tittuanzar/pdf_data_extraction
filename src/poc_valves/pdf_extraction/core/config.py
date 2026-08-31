@@ -41,6 +41,17 @@ class Settings(BaseSettings):
     # Number of Ext. ID comparisons sent per accuracy-evaluation LLM call.
     ACCURACY_BATCH_SIZE: int = 25
 
+    # Token cost rates for the aggregate usage/cost log line (see
+    # pdf_extraction.services.usage_service), mirroring the SV2 pipeline's
+    # cost accounting (core.config.settings.prompt_cost_per_1k etc). Same
+    # env var names as the SV2 side since both bill against the same
+    # OpenAI account/pricing. Defaults are GPT-4.1 mini + text-embedding-3-small
+    # pricing - update if the model or its pricing changes.
+    OPENAI_PROMPT_COST_PER_1K: float = 0.0004
+    OPENAI_COMPLETION_COST_PER_1K: float = 0.0016
+    OPENAI_EMBEDDING_COST_PER_1K: float = 0.00002
+    OPENAI_USD_TO_INR_RATE: float = 94.2
+
     # Max number of LLM requests issued at once when a phase (per-category
     # extraction, accuracy-batch scoring) has several independent calls to
     # make. Only affects PdfExtractionPipeline (the configurable/generic
