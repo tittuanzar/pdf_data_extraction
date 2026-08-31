@@ -6,9 +6,9 @@ document_extraction_fields:
   unit: —
   source:
     enquiry_field_name: Tag No.
-    example_value: TAG-101 | TAG-102 | TAG-103
+    example_value: TAG-001 | TAG-002 | TAG-003
   logic: Copy tag number verbatim from the tag number field at the top of the Enquiry DS.
-  example_output: TAG-101 | TAG-102 | TAG-103
+  example_output: TAG-001 | TAG-002 | TAG-003
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -24,11 +24,9 @@ document_extraction_fields:
   unit: —
   source:
     enquiry_field_name: Service
-    example_value: COOLING WATER TO E-205 (PUMP P-101A/B) | LP STEAM TO E-210 PREHEATER | PLANT AIR TO
-      T-330 AERATION SYSTEM
+    example_value: COOLING WATER TO HX-01 (PUMP P-01A/B) | LP STEAM TO E-01 PREHEATER | PLANT AIR TO T-01 AERATION SYSTEM
   logic: Copy service description verbatim from the Service field of the Enquiry DS.
-  example_output: COOLING WATER TO E-205 (PUMP P-101A/B) | LP STEAM TO E-210 PREHEATER | PLANT AIR TO
-    T-330 AERATION SYSTEM
+  example_output: COOLING WATER TO HX-01 (PUMP P-01A/B) | LP STEAM TO E-01 PREHEATER | PLANT AIR TO T-01 AERATION SYSTEM
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -81,9 +79,9 @@ document_extraction_fields:
   unit: in / Schedule
   source:
     enquiry_field_name: Line Size and Schedule — Inlet
-    example_value: 3 in STD | 12 in XS | 6 in STD
+    example_value: 4 in STD | 10 in XS | 6 in STD
   logic: Extract inlet size and schedule from the Line Size and Schedule (Inlet) field. Parse leading number as nominal size; schedule follows (STD, XS, 40S etc.)
-  example_output: 3 in/STD | 12 in/XS | 6 in/STD
+  example_output: 4 in/STD | 10 in/XS | 6 in/STD
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -99,9 +97,9 @@ document_extraction_fields:
   unit: in / Schedule
   source:
     enquiry_field_name: Line Size and Schedule — Outlet
-    example_value: 3 in STD | 12 in XS | 6 in STD
+    example_value: 4 in STD | 10 in XS | 6 in STD
   logic: Extract outlet size and schedule from the Line Size and Schedule (Outlet) field. Usually same as inlet unless expander is fitted.
-  example_output: 3 in/STD | 12 in/XS | 6 in/STD
+  example_output: 4 in/STD | 10 in/XS | 6 in/STD
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -117,9 +115,9 @@ document_extraction_fields:
   unit: kgf/cm²-g
   source:
     enquiry_field_name: Design Pressure / Temperature
-    example_value: 10 kgf/cm²-g | 8 kgf/cm²-g | 10 kgf/cm²-g
+    example_value: 12 kgf/cm²-g | 10 kgf/cm²-g | 12 kgf/cm²-g
   logic: Extract maximum design pressure from the Design Pressure / Temperature field of the Enquiry DS. This is the higher of the two values stated.
-  example_output: 10 kgf/cm²-g | 8 kgf/cm²-g | 10 kgf/cm²-g
+  example_output: 12 kgf/cm²-g | 10 kgf/cm²-g | 12 kgf/cm²-g
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -155,9 +153,9 @@ document_extraction_fields:
   unit: °C
   source:
     enquiry_field_name: Design Pressure / Temperature
-    example_value: 150 °C | 220 °C | 65 °C
+    example_value: 90 °C | 180 °C | 45 °C
   logic: Extract maximum design temperature from the Design Pressure / Temperature field of the Enquiry DS.
-  example_output: 150 °C | 220 °C | 65 °C
+  example_output: 90 °C | 180 °C | 45 °C
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -174,9 +172,9 @@ document_extraction_fields:
   unit: °C
   source:
     enquiry_field_name: Ambient Temperature / Process Notes Page 2
-    example_value: 5 °C (MDMT from process notes, all tags)
+    example_value: 0 °C (MDMT from process notes, all tags)
   logic: MDMT (Minimum Design Metal Temperature) is stated in the DS Page 2 Process Notes. Not the same as ambient temperature. Extract from the notes text.
-  example_output: 5 °C | 5 °C | 5 °C
+  example_output: 0 °C | 0 °C | 0 °C
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -192,9 +190,9 @@ document_extraction_fields:
   unit: Am³/h | kg/h | Nm³/h
   source:
     enquiry_field_name: Flow Rate @ Max Flow
-    example_value: 12 | 6500 | 2600
+    example_value: 15 | 7000 | 3000
   logic: Extract flow rate value from the '@ Max Flow' column of the Flow Rate field. Preserve units exactly as stated.
-  example_output: 12 m³/h | 6500 kg/h | 2600 Nm³/h
+  example_output: 15 m³/h | 7000 kg/h | 3000 Nm³/h
   dependencies:
     service_dependent: true
     sector_dependent: false
@@ -210,9 +208,9 @@ document_extraction_fields:
   unit: Am³/h | kg/h | Nm³/h
   source:
     enquiry_field_name: Flow Rate @ Norm Flow
-    example_value: 10 | 5800 | 2400
+    example_value: 12 | 6000 | 2700
   logic: Extract flow rate value from the '@ Norm. Flow' column of the Flow Rate field.
-  example_output: 10 m³/h | 5800 kg/h | 2400 Nm³/h
+  example_output: 12 m³/h | 6000 kg/h | 2700 Nm³/h
   dependencies:
     service_dependent: true
     sector_dependent: false
@@ -229,9 +227,9 @@ document_extraction_fields:
   unit: Am³/h | kg/h | Nm³/h
   source:
     enquiry_field_name: Flow Rate @ Min Flow
-    example_value: 6 | 2900 | 2200
+    example_value: 8 | 3000 | 2400
   logic: Extract flow rate value from the '@ Min. Flow' column of the Flow Rate field.
-  example_output: 6 m³/h | 2900 kg/h | 2200 Nm³/h
+  example_output: 8 m³/h | 3000 kg/h | 2400 Nm³/h
   dependencies:
     service_dependent: true
     sector_dependent: false
@@ -247,9 +245,9 @@ document_extraction_fields:
   unit: kgf/cm²-g
   source:
     enquiry_field_name: Inlet Pressure @ Max Flow
-    example_value: 7.0 | 3.3 | 4.3
+    example_value: 8.0 | 4.0 | 5.0
   logic: Extract inlet pressure from the '@ Max Flow' column of the Inlet Pressure field.
-  example_output: 7.0 kgf/cm²-g | 3.3 kgf/cm²-g | 4.3 kgf/cm²-g
+  example_output: 8.0 kgf/cm²-g | 4.0 kgf/cm²-g | 5.0 kgf/cm²-g
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -266,9 +264,9 @@ document_extraction_fields:
   unit: kgf/cm²-g
   source:
     enquiry_field_name: Inlet Pressure @ Norm Flow
-    example_value: 7.0 | 3.3 | 4.3
+    example_value: 8.0 | 4.0 | 5.0
   logic: Extract inlet pressure from the '@ Norm. Flow' column of the Inlet Pressure field.
-  example_output: 7.0 kgf/cm²-g | 3.3 kgf/cm²-g | 4.3 kgf/cm²-g
+  example_output: 8.0 kgf/cm²-g | 4.0 kgf/cm²-g | 5.0 kgf/cm²-g
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -283,9 +281,9 @@ document_extraction_fields:
   unit: kgf/cm²-g
   source:
     enquiry_field_name: Inlet Pressure @ Min Flow
-    example_value: 7.1 | 3.3 | 4.4
+    example_value: 8.1 | 4.0 | 5.1
   logic: Extract inlet pressure from the '@ Min. Flow' column of the Inlet Pressure field.
-  example_output: 7.1 kgf/cm²-g | 3.3 kgf/cm²-g | 4.4 kgf/cm²-g
+  example_output: 8.1 kgf/cm²-g | 4.0 kgf/cm²-g | 5.1 kgf/cm²-g
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -300,9 +298,9 @@ document_extraction_fields:
   unit: kgf/cm²-g
   source:
     enquiry_field_name: Not directly stated — derived from Inlet Pressure and Pressure Drop
-    example_value: 'Calculated: 7.0 - 6.5 = 0.5 | 3.3 - 0.3 = 3.0 | 4.3 - 1.7 = 2.6'
+    example_value: 'Calculated: 8.0 - 7.0 = 1.0 | 4.0 - 0.4 = 3.6 | 5.0 - 2.0 = 3.0'
   logic: Outlet Pressure = Inlet Pressure − Pressure Drop for each case. Sv2 requires explicit outlet pressure.
-  example_output: 0.5 kgf/cm²-g | 3.0 kgf/cm²-g | 2.6 kgf/cm²-g
+  example_output: 1.0 kgf/cm²-g | 3.6 kgf/cm²-g | 3.0 kgf/cm²-g
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -319,9 +317,9 @@ document_extraction_fields:
   unit: kgf/cm²-g
   source:
     enquiry_field_name: Not directly stated — derived from Inlet Pressure and Pressure Drop
-    example_value: 'Calculated: 7.0 - 6.6 = 0.4 | 3.3 - 0.31 = 3.0 | 4.3 - 1.7 = 2.6'
+    example_value: 'Calculated: 8.0 - 7.1 = 0.9 | 4.0 - 0.41 = 3.59 | 5.0 - 2.0 = 3.0'
   logic: Outlet Pressure NOR = Inlet Pressure NOR − Pressure Drop NOR.
-  example_output: 0.4 kgf/cm²-g | 3.0 kgf/cm²-g | 2.6 kgf/cm²-g
+  example_output: 0.9 kgf/cm²-g | 3.59 kgf/cm²-g | 3.0 kgf/cm²-g
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -336,9 +334,9 @@ document_extraction_fields:
   unit: kgf/cm²-g
   source:
     enquiry_field_name: Not directly stated — derived from Inlet Pressure and Pressure Drop
-    example_value: 'Calculated: 7.1 - 6.7 = 0.4 | 3.3 - 0.32 = 3.0 | 4.4 - 1.8 = 2.6'
+    example_value: 'Calculated: 8.1 - 7.2 = 0.9 | 4.0 - 0.42 = 3.58 | 5.1 - 2.1 = 3.0'
   logic: Outlet Pressure MIN = Inlet Pressure MIN − Pressure Drop MIN.
-  example_output: 0.4 kgf/cm²-g | 3.0 kgf/cm²-g | 2.6 kgf/cm²-g
+  example_output: 0.9 kgf/cm²-g | 3.58 kgf/cm²-g | 3.0 kgf/cm²-g
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -353,9 +351,9 @@ document_extraction_fields:
   unit: kgf/cm²
   source:
     enquiry_field_name: Pressure Drop @ Max Flow
-    example_value: 6.5 | 0.3 | 1.7
+    example_value: 7.0 | 0.4 | 2.0
   logic: Extract pressure drop from the '@ Max Flow' column of the Pressure Drop field.
-  example_output: 6.5 kgf/cm² | 0.3 kgf/cm² | 1.7 kgf/cm²
+  example_output: 7.0 kgf/cm² | 0.4 kgf/cm² | 2.0 kgf/cm²
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -371,9 +369,9 @@ document_extraction_fields:
   unit: kgf/cm²
   source:
     enquiry_field_name: Pressure Drop @ Norm Flow
-    example_value: 6.6 | 0.31 | 1.7
+    example_value: 7.1 | 0.41 | 2.0
   logic: Extract pressure drop from the '@ Norm. Flow' column of the Pressure Drop field.
-  example_output: 6.6 kgf/cm² | 0.31 kgf/cm² | 1.7 kgf/cm²
+  example_output: 7.1 kgf/cm² | 0.41 kgf/cm² | 2.0 kgf/cm²
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -388,9 +386,9 @@ document_extraction_fields:
   unit: kgf/cm²
   source:
     enquiry_field_name: Pressure Drop @ Min Flow
-    example_value: 6.7 | 0.32 | 1.8
+    example_value: 7.2 | 0.42 | 2.1
   logic: Extract pressure drop from the '@ Min. Flow' column of the Pressure Drop field.
-  example_output: 6.7 kgf/cm² | 0.32 kgf/cm² | 1.8 kgf/cm²
+  example_output: 7.2 kgf/cm² | 0.42 kgf/cm² | 2.1 kgf/cm²
   dependencies:
     service_dependent: false
     sector_dependent: false
@@ -405,9 +403,9 @@ document_extraction_fields:
   unit: °C
   source:
     enquiry_field_name: Inlet Temperature @ Max Flow
-    example_value: 100 | 160 | 40
+    example_value: 90 | 180 | 45
   logic: Extract temperature from the '@ Max Flow' column of the Inlet Temperature field.
-  example_output: 100 °C | 160 °C | 40 °C
+  example_output: 90 °C | 180 °C | 45 °C
   dependencies:
     service_dependent: true
     sector_dependent: false
@@ -423,9 +421,9 @@ document_extraction_fields:
   unit: °C
   source:
     enquiry_field_name: Inlet Temperature @ Norm Flow
-    example_value: 100 | 160 | 40
+    example_value: 90 | 180 | 45
   logic: Extract temperature from the '@ Norm. Flow' column of the Inlet Temperature field.
-  example_output: 100 °C | 160 °C | 40 °C
+  example_output: 90 °C | 180 °C | 45 °C
   dependencies:
     service_dependent: true
     sector_dependent: false
@@ -440,9 +438,9 @@ document_extraction_fields:
   unit: °C
   source:
     enquiry_field_name: Inlet Temperature @ Min Flow
-    example_value: 100 | 160 | 40
+    example_value: 90 | 180 | 45
   logic: Extract temperature from the '@ Min. Flow' column of the Inlet Temperature field.
-  example_output: 100 °C | 160 °C | 40 °C
+  example_output: 90 °C | 180 °C | 45 °C
   dependencies:
     service_dependent: true
     sector_dependent: false
@@ -457,9 +455,9 @@ document_extraction_fields:
   unit: kg/m³ or dimensionl ess or g/mol
   source:
     enquiry_field_name: Inlet Density / Specific Gravity / Molecular Mass
-    example_value: 960 kg/m³ (SG=0.96) | — (steam) | 28.96 (MW)
-  logic: 'Liquid service: the density field gives density in kg/m3 → divide by 1000 to get SG (e.g. 960/1000 = 0.96). Gas service: the field gives MW in g/mol (e.g. 28.96 for air). Steam service: leave blank; Sv2 uses steam tables.'
-  example_output: SG = 0.96 | Blank (steam) | MW = 28.96 g/mol
+    example_value: 950 kg/m³ (SG=0.95) | — (steam) | 28.96 (MW)
+  logic: 'Liquid service: the density field gives density in kg/m3 → divide by 1000 to get SG (e.g. 950/1000 = 0.95). Gas service: the field gives MW in g/mol (e.g. 28.96 for air). Steam service: leave blank; Sv2 uses steam tables.'
+  example_output: SG = 0.95 | Blank (steam) | MW = 28.96 g/mol
   dependencies:
     service_dependent: true
     sector_dependent: false
@@ -475,9 +473,9 @@ document_extraction_fields:
   unit: cP
   source:
     enquiry_field_name: Inlet Viscosity
-    example_value: 0.30 | 0.014 | 0.019
+    example_value: 0.85 | 0.015 | 0.018
   logic: Copy viscosity value from the Viscosity field of the Enquiry DS.
-  example_output: 0.30 cP | 0.014 cP | 0.019 cP
+  example_output: 0.85 cP | 0.015 cP | 0.018 cP
   dependencies:
     service_dependent: true
     sector_dependent: false
@@ -494,9 +492,9 @@ document_extraction_fields:
   unit: Dimensionl ess
   source:
     enquiry_field_name: Inlet Compressibility Factor
-    example_value: — (liquid; not applicable) | — (steam) | 0.999
+    example_value: — (liquid; not applicable) | — (steam) | 0.998
   logic: Extract Z from the Compressibility Factor field. Applicable for gas/vapour only. Leave blank for liquid and steam (Sv2 applies steam tables).
-  example_output: N/A (liquid) | N/A (steam) | 0.999
+  example_output: N/A (liquid) | N/A (steam) | 0.998
   dependencies:
     service_dependent: true
     sector_dependent: false
@@ -512,9 +510,9 @@ document_extraction_fields:
   unit: Dimensionl ess
   source:
     enquiry_field_name: Inlet Specific Heats Ratio
-    example_value: — (liquid; not applicable) | 1.317 (steam) | 1.4 (air)
+    example_value: — (liquid; not applicable) | 1.30 (steam) | 1.4 (air)
   logic: Extract K from the Specific Heats Ratio field. Applicable for gas and steam only. Leave blank for liquid services.
-  example_output: N/A (liquid) | 1.317 | 1.4
+  example_output: N/A (liquid) | 1.30 | 1.4
   dependencies:
     service_dependent: true
     sector_dependent: false
@@ -531,9 +529,9 @@ document_extraction_fields:
   unit: kgf/cm²-a
   source:
     enquiry_field_name: Inlet Vapour Pressure
-    example_value: 1.031 kgf/cm²-a | — (steam; not applicable) | — (gas; not applicable)
+    example_value: 0.90 kgf/cm²-a | — (steam; not applicable) | — (gas; not applicable)
   logic: Extract vapour pressure from the Vapour Pressure field. Applicable for liquid services only. Used to check cavitation and flashing.
-  example_output: 1.031 kgf/cm²-a | N/A | N/A
+  example_output: 0.90 kgf/cm²-a | N/A | N/A
   dependencies:
     service_dependent: true
     sector_dependent: false
@@ -836,7 +834,7 @@ document_extraction_fields:
     enquiry_field_name: Actuator Design Pressure
     example_value: Not stated in Enquiry DS — derived from Design Pressure (MAX)
   logic: Shut-off pressure = maximum design pressure of the valve (Design Pressure MAX).
-  example_output: 10 kgf/cm² (Tag1) | 8 kgf/cm² (Tag2) | 10 kgf/cm² (Tag3)
+  example_output: 12 kgf/cm² (Tag1) | 10 kgf/cm² (Tag2) | 12 kgf/cm² (Tag3)
   dependencies:
     service_dependent: false
     sector_dependent: false
